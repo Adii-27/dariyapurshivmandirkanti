@@ -15,6 +15,7 @@ dist-studio
 .vinxi
 .tanstack/**
 .nitro
+.vercel
 .sanity/
 *.mp4
 *.local
