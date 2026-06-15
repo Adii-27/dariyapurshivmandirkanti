@@ -118,13 +118,25 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
             )}
           </a>
           <button
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={`${open ? "Close" : "Open"} menu${
+              unseenUpdates > 0
+                ? `, ${unseenUpdates} unread update${unseenUpdates === 1 ? "" : "s"}`
+                : ""
+            }`}
             aria-controls="mobile-navigation"
             aria-expanded={open}
             onClick={() => setOpen((o) => !o)}
-            className="interactive-surface grid h-11 w-11 shrink-0 place-items-center rounded-full border border-border bg-card/80 shadow-sm lg:hidden"
+            className="interactive-surface relative grid h-11 w-11 shrink-0 place-items-center rounded-full border border-border bg-card/80 shadow-sm lg:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            {unseenUpdates > 0 && (
+              <span
+                aria-hidden="true"
+                className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full border-2 border-cream bg-rose-600 px-1 text-[10px] font-bold leading-none tabular-nums text-white shadow-sm"
+              >
+                {unseenUpdates}
+              </span>
+            )}
           </button>
         </div>
       </div>
