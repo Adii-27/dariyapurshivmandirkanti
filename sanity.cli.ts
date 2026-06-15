@@ -1,0 +1,20 @@
+import { defineCliConfig } from "sanity/cli";
+
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
+
+if (!projectId) {
+  throw new Error(
+    "SANITY_STUDIO_PROJECT_ID is required. Copy .env.example to .env.local and add the Sanity project ID.",
+  );
+}
+
+export default defineCliConfig({
+  api: {
+    projectId,
+    dataset,
+  },
+  deployment: {
+    appId: process.env.SANITY_STUDIO_APP_ID,
+  },
+});

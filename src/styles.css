@@ -1,0 +1,310 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-saffron: var(--saffron);
+  --color-saffron-deep: var(--saffron-deep);
+  --color-gold: var(--gold);
+  --color-gold-soft: var(--gold-soft);
+  --color-sandstone: var(--sandstone);
+  --color-cream: var(--cream);
+  --color-ink: var(--ink);
+  --color-ember: var(--ember);
+
+  --font-display: "Cormorant Garamond", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-hindi: "Tiro Devanagari Hindi", "Noto Serif Devanagari", serif;
+}
+
+:root {
+  --radius: 0.75rem;
+
+  /* Brand palette — saffron, gold, sandstone */
+  --saffron: oklch(0.74 0.18 55);
+  --saffron-deep: oklch(0.62 0.21 38);
+  --ember: oklch(0.52 0.22 32);
+  --gold: oklch(0.82 0.14 85);
+  --gold-soft: oklch(0.91 0.07 88);
+  --sandstone: oklch(0.93 0.04 75);
+  --cream: oklch(0.985 0.013 85);
+  --ink: oklch(0.22 0.03 50);
+
+  --background: var(--cream);
+  --foreground: var(--ink);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--ink);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--ink);
+  --primary: var(--saffron-deep);
+  --primary-foreground: oklch(0.99 0.01 80);
+  --secondary: var(--sandstone);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.95 0.025 75);
+  --muted-foreground: oklch(0.45 0.04 50);
+  --accent: var(--gold);
+  --accent-foreground: var(--ink);
+  --destructive: oklch(0.58 0.22 27);
+  --destructive-foreground: oklch(0.99 0 0);
+  --border: oklch(0.88 0.04 75);
+  --input: oklch(0.88 0.04 75);
+  --ring: var(--saffron);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+    overflow-x: clip;
+  }
+  body {
+    min-width: 320px;
+    overflow-x: clip;
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(
+        at 20% 0%,
+        color-mix(in oklab, var(--gold) 18%, transparent) 0px,
+        transparent 50%
+      ),
+      radial-gradient(
+        at 80% 100%,
+        color-mix(in oklab, var(--saffron) 14%, transparent) 0px,
+        transparent 55%
+      );
+    background-attachment: fixed;
+  }
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+  :where(a, button, [role="button"]) {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+  .font-hindi {
+    font-family: var(--font-hindi);
+    font-feature-settings: "kern";
+  }
+}
+
+.interactive-surface {
+  transition-property: transform, border-color, background-color, color, box-shadow, opacity;
+  transition-duration: 280ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.interactive-surface:active {
+  opacity: 0.9;
+  transform: translate3d(0, 0, 0) scale(0.985);
+}
+
+.modal-scroll {
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.scrollbar-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+section[id],
+[id].scroll-anchor {
+  scroll-margin-top: 5.5rem;
+}
+
+@utility gradient-saffron {
+  background-image: linear-gradient(
+    135deg,
+    var(--saffron) 0%,
+    var(--saffron-deep) 50%,
+    var(--ember) 100%
+  );
+}
+@utility gradient-gold {
+  background-image: linear-gradient(135deg, var(--gold-soft) 0%, var(--gold) 100%);
+}
+@utility text-gradient-saffron {
+  background-image: linear-gradient(135deg, var(--saffron) 0%, var(--ember) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility text-gradient-gold {
+  background-image: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--gold) 70%, var(--saffron-deep)),
+    var(--saffron-deep)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+@utility shadow-sacred {
+  box-shadow:
+    0 1px 0 0 color-mix(in oklab, var(--gold) 40%, transparent) inset,
+    0 20px 60px -25px color-mix(in oklab, var(--saffron-deep) 50%, transparent),
+    0 8px 24px -12px color-mix(in oklab, var(--ember) 25%, transparent);
+}
+@utility shadow-glow {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--gold) 50%, transparent),
+    0 0 40px -5px color-mix(in oklab, var(--saffron) 60%, transparent);
+}
+@utility divider-om {
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklab, var(--saffron-deep) 60%, transparent),
+    transparent
+  );
+  height: 1px;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.35);
+  }
+}
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -8px, 0);
+  }
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@utility animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+  will-change: opacity, transform;
+  transform-origin: center;
+}
+@utility animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+@utility animate-marquee {
+  animation: marquee 60s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .interactive-surface:hover {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  body {
+    background-attachment: scroll;
+  }
+
+  .touch-overlay {
+    opacity: 1;
+  }
+
+  .touch-caption {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Hide any remaining Lovable branding elements */
+#lovable-badge,
+[data-lovable-badge],
+[class*="lovable-badge"],
+[class*="lovableBadge"],
+a[href*="lovable.dev"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

@@ -1,0 +1,24 @@
+{
+  "url": "https://example.com",
+  "name": "Dariyapur Shiv Mandir Kanti",
+  "alternateName": "Dariyapur Shiv Mandir",
+  "description": "Official website of Dariyapur Shiv Mandir Kanti, a Hindu temple serving devotees in Kanti, Muzaffarpur, Bihar.",
+  "image": "/Banner.png",
+  "logo": "/logo.png",
+  "email": "dariyapurshivmandirkanti@gmail.com",
+  "address": {
+    "streetAddress": "Near Paswan Chowk, Dariyapur",
+    "addressLocality": "Kanti",
+    "addressRegion": "Bihar",
+    "addressCountry": "IN"
+  },
+  "geo": {
+    "latitude": 26.1581116,
+    "longitude": 85.3053131
+  },
+  "social": [
+    "https://www.instagram.com/dariyapurshivmandirkanti",
+    "https://www.facebook.com/share/1PK9TGw3UY/",
+    "https://youtube.com/@dariyapurshivmandirkanti"
+  ]
+}
