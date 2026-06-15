@@ -1,34 +1,65 @@
 import { useEffect, useState } from "react";
 
 const HOURS = { open: 7, close: 20 }; // 7am - 8pm
+const INDIA_TIME_ZONE = "Asia/Kolkata";
+const WEEKDAY_INDEX = {
+  Sun: 0,
+  Mon: 1,
+  Tue: 2,
+  Wed: 3,
+  Thu: 4,
+  Fri: 5,
+  Sat: 6,
+} as const;
+const INDIA_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  timeZone: INDIA_TIME_ZONE,
+  weekday: "short",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hourCycle: "h23",
+});
+
+function getIndiaTime(now = new Date()) {
+  const parts = Object.fromEntries(
+    INDIA_TIME_FORMATTER.formatToParts(now).map(({ type, value }) => [type, value]),
+  );
+
+  return {
+    today: WEEKDAY_INDEX[parts.weekday as keyof typeof WEEKDAY_INDEX],
+    hour: Number(parts.hour),
+    minute: Number(parts.minute),
+    second: Number(parts.second),
+  };
+}
 
 export function useTempleStatus() {
   const [state, setState] = useState({
     isOpen: false,
     label: "—",
     next: "",
-    now: new Date(),
+    today: null as number | null,
   });
   useEffect(() => {
     const tick = () => {
-      const now = new Date();
-      const h = now.getHours() + now.getMinutes() / 60;
-      const isOpen = h >= HOURS.open && h < HOURS.close;
+      const { today, hour, minute, second } = getIndiaTime();
+      const openMinute = HOURS.open * 60;
+      const closeMinute = HOURS.close * 60;
+      const currentMinute = hour * 60 + minute;
+      const currentSecond = currentMinute * 60 + second;
+      const isOpen = currentMinute >= openMinute && currentMinute < closeMinute;
       const label = isOpen ? "OPEN NOW" : "CLOSED NOW";
       let next = "";
       if (isOpen) {
-        const close = new Date(now);
-        close.setHours(HOURS.close, 0, 0, 0);
-        const mins = Math.round((+close - +now) / 60000);
+        const mins = Math.round((closeMinute * 60 - currentSecond) / 60);
         next = `Closes in ${Math.floor(mins / 60)}h ${mins % 60}m`;
       } else {
-        const open = new Date(now);
-        if (h >= HOURS.close) open.setDate(open.getDate() + 1);
-        open.setHours(HOURS.open, 0, 0, 0);
-        const mins = Math.round((+open - +now) / 60000);
+        const nextOpenSecond =
+          currentMinute < openMinute ? openMinute * 60 : (24 * 60 + openMinute) * 60;
+        const mins = Math.round((nextOpenSecond - currentSecond) / 60);
         next = `Opens in ${Math.floor(mins / 60)}h ${mins % 60}m`;
       }
-      setState({ isOpen, label, next, now });
+      setState({ isOpen, label, next, today });
     };
     tick();
     const id = setInterval(tick, 30_000);
@@ -38,9 +69,8 @@ export function useTempleStatus() {
 }
 
 export function StatusCard() {
-  const { isOpen, label, next, now } = useTempleStatus();
+  const { isOpen, label, next, today } = useTempleStatus();
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  const today = now.getDay();
 
   return (
     <div className="relative w-full max-w-sm rounded-3xl border border-gold/40 bg-card/85 p-6 backdrop-blur-xl shadow-sacred">
@@ -76,7 +106,9 @@ export function StatusCard() {
           <div
             key={d}
             className={`flex items-center justify-between rounded-md px-2.5 py-1.5 transition ${
-              i === today ? "bg-saffron/10 text-saffron-deep font-semibold" : "text-ink/70"
+              today !== null && i === today
+                ? "bg-saffron/10 text-saffron-deep font-semibold"
+                : "text-ink/70"
             }`}
           >
             <span>{d}</span>
