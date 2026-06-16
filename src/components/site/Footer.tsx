@@ -3,10 +3,19 @@ import { motion } from "framer-motion";
 import { TEMPLE_LOGO } from "@/lib/media";
 
 const VISITOR_COUNTER_URL =
-  "https://api.counterapi.dev/v1/dariyapur-shiv-mandir-kanti/website-visitors";
+  "https://api.counterapi.dev/v1/dariyapur-shiv-mandir-kanti/website-visitors/";
 const VISITOR_SESSION_KEY = "dsmk-visitor-counted";
+const VISITOR_CACHE_KEY = "dsmk-visitor-count-cache";
+const VISITOR_CACHE_TTL_MS = 30 * 60 * 1000;
+const VISITOR_FETCH_TIMEOUT_MS = 8000;
+const VISITOR_RETRY_DELAY_MS = 700;
 
 let visitorCountRequest: Promise<number> | null = null;
+
+type CachedVisitorCount = {
+  count: number;
+  savedAt: number;
+};
 
 function extractCounterValue(payload: unknown): number | null {
   if (typeof payload === "number" && Number.isFinite(payload)) return payload;
@@ -21,40 +30,115 @@ function extractCounterValue(payload: unknown): number | null {
   return extractCounterValue(record.data);
 }
 
-function loadVisitorCount() {
-  if (visitorCountRequest) return visitorCountRequest;
+function getCachedVisitorCount(): CachedVisitorCount | null {
+  try {
+    const raw = window.localStorage.getItem(VISITOR_CACHE_KEY);
+    if (!raw) return null;
 
-  visitorCountRequest = (async () => {
-    let shouldIncrement = true;
-
-    try {
-      shouldIncrement = window.sessionStorage.getItem(VISITOR_SESSION_KEY) !== "true";
-    } catch {
-      // Continue without session deduplication when storage is unavailable.
+    const cache = JSON.parse(raw) as Partial<CachedVisitorCount>;
+    if (
+      typeof cache.count !== "number" ||
+      !Number.isFinite(cache.count) ||
+      typeof cache.savedAt !== "number" ||
+      !Number.isFinite(cache.savedAt)
+    ) {
+      return null;
     }
 
-    const response = await fetch(
-      shouldIncrement ? `${VISITOR_COUNTER_URL}/up` : VISITOR_COUNTER_URL,
-      {
-        headers: { Accept: "application/json" },
-        cache: "no-store",
-      },
-    );
+    return { count: cache.count, savedAt: cache.savedAt };
+  } catch {
+    return null;
+  }
+}
+
+function cacheVisitorCount(count: number) {
+  const cache: CachedVisitorCount = { count, savedAt: Date.now() };
+
+  try {
+    window.localStorage.setItem(VISITOR_CACHE_KEY, JSON.stringify(cache));
+  } catch {
+    // A blocked storage write should not make the visible counter fail.
+  }
+}
+
+function hasCountedThisSession() {
+  try {
+    return window.sessionStorage.getItem(VISITOR_SESSION_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function markCountedThisSession() {
+  try {
+    window.sessionStorage.setItem(VISITOR_SESSION_KEY, "true");
+  } catch {
+    // The remote count still succeeded even if session storage is blocked.
+  }
+}
+
+function wait(ms: number) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, ms);
+  });
+}
+
+async function fetchCounterValue(url: string) {
+  const controller = new AbortController();
+  const timeout = window.setTimeout(() => controller.abort(), VISITOR_FETCH_TIMEOUT_MS);
+
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+      cache: "no-store",
+      signal: controller.signal,
+    });
 
     if (!response.ok) throw new Error("Visitor counter request failed");
 
     const count = extractCounterValue((await response.json()) as unknown);
     if (count === null) throw new Error("Visitor counter returned an invalid value");
 
-    if (shouldIncrement) {
-      try {
-        window.sessionStorage.setItem(VISITOR_SESSION_KEY, "true");
-      } catch {
-        // The remote count still succeeded even if session storage is blocked.
-      }
+    return count;
+  } finally {
+    window.clearTimeout(timeout);
+  }
+}
+
+async function fetchCounterValueWithRetry(url: string) {
+  try {
+    return await fetchCounterValue(url);
+  } catch (error) {
+    await wait(VISITOR_RETRY_DELAY_MS);
+    return fetchCounterValue(url).catch(() => {
+      throw error;
+    });
+  }
+}
+
+function loadVisitorCount() {
+  if (visitorCountRequest) return visitorCountRequest;
+
+  visitorCountRequest = (async () => {
+    const cached = getCachedVisitorCount();
+    const shouldIncrement = !hasCountedThisSession();
+    const hasFreshCache = cached !== null && Date.now() - cached.savedAt < VISITOR_CACHE_TTL_MS;
+
+    if (!shouldIncrement && hasFreshCache) {
+      return cached.count;
     }
 
-    return count;
+    try {
+      const count = await fetchCounterValueWithRetry(
+        shouldIncrement ? `${VISITOR_COUNTER_URL}up` : VISITOR_COUNTER_URL,
+      );
+      cacheVisitorCount(count);
+      if (shouldIncrement) markCountedThisSession();
+      return count;
+    } catch (error) {
+      if (cached !== null) return cached.count;
+      throw error;
+    }
   })().catch((error: unknown) => {
     visitorCountRequest = null;
     throw error;
@@ -255,6 +339,7 @@ export function Footer() {
 function VisitorCounter() {
   const containerRef = useRef<HTMLDivElement>(null);
   const hasStarted = useRef(false);
+  const displayCountRef = useRef(0);
   const [count, setCount] = useState<number | null>(null);
   const [displayCount, setDisplayCount] = useState(0);
   const [unavailable, setUnavailable] = useState(false);
@@ -263,9 +348,14 @@ function VisitorCounter() {
     const start = () => {
       if (hasStarted.current) return;
       hasStarted.current = true;
+      const cached = getCachedVisitorCount();
+      if (cached !== null) setCount(cached.count);
+
       void loadVisitorCount()
         .then(setCount)
-        .catch(() => setUnavailable(true));
+        .catch(() => {
+          if (getCachedVisitorCount() === null) setUnavailable(true);
+        });
     };
 
     const element = containerRef.current;
@@ -289,10 +379,14 @@ function VisitorCounter() {
 
   useEffect(() => {
     if (count === null) return;
+    const from = displayCountRef.current;
+    const difference = count - from;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      displayCountRef.current = count;
       setDisplayCount(count);
       return;
     }
+    if (difference === 0) return;
 
     const duration = 900;
     const startedAt = performance.now();
@@ -301,7 +395,9 @@ function VisitorCounter() {
     const animateCount = (now: number) => {
       const progress = Math.min((now - startedAt) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setDisplayCount(Math.round(count * eased));
+      const nextCount = Math.round(from + difference * eased);
+      displayCountRef.current = nextCount;
+      setDisplayCount(nextCount);
       if (progress < 1) frame = window.requestAnimationFrame(animateCount);
     };
 
