@@ -4,11 +4,16 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import {
+  getGoogleAnalyticsHeadScripts,
+  trackGoogleAnalyticsPageView,
+} from "@/lib/analytics";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -81,6 +86,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "icon", href: "/favicon.ico" },
     ],
+    scripts: getGoogleAnalyticsHeadScripts(),
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -106,9 +112,26 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
+      <GoogleAnalyticsRouteTracker />
       <main>
         <Outlet />
       </main>
     </QueryClientProvider>
   );
+}
+
+function GoogleAnalyticsRouteTracker() {
+  const href = useRouterState({ select: (state) => state.location.href });
+  const previousHref = useRef(href);
+
+  useEffect(() => {
+    if (previousHref.current === href) {
+      return;
+    }
+
+    previousHref.current = href;
+    trackGoogleAnalyticsPageView(href);
+  }, [href]);
+
+  return null;
 }
