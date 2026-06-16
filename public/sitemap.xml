@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://example.com/</loc></url>
-  <url><loc>https://example.com/about</loc></url>
-  <url><loc>https://example.com/gallery</loc></url>
-  <url><loc>https://example.com/sangeet</loc></url>
-  <url><loc>https://example.com/seva</loc></url>
-  <url><loc>https://example.com/visitor-information</loc></url>
-  <url><loc>https://example.com/location</loc></url>
-  <url><loc>https://example.com/contact</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/about</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/gallery</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/sangeet</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/seva</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/visitor-information</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/location</loc></url>
+  <url><loc>https://dariyapurshivmandirkantiorg.vercel.app/contact</loc></url>
 </urlset>

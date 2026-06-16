@@ -4,7 +4,7 @@ import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const config = JSON.parse(await readFile(path.join(root, "site.config.json"), "utf8"));
-const siteUrl = (process.env.VITE_SITE_URL || config.url).replace(/\/+$/, "");
+const siteUrl = config.url.replace(/\/+$/, "");
 const paths = [
   "/",
   "/about",

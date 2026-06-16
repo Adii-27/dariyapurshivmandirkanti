@@ -62,7 +62,7 @@ function normalizeSiteUrl(value: string) {
 }
 
 export function getSiteUrl() {
-  return normalizeSiteUrl(import.meta.env.VITE_SITE_URL?.trim() || siteConfig.url);
+  return normalizeSiteUrl(siteConfig.url);
 }
 
 export function absoluteUrl(path: string) {
