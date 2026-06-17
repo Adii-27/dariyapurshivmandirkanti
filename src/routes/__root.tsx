@@ -10,10 +10,9 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useRef, type ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
-import {
-  getGoogleAnalyticsHeadScripts,
-  trackGoogleAnalyticsPageView,
-} from "@/lib/analytics";
+import { NetworkStatusNotifier } from "@/components/site/NetworkStatusNotifier";
+import { Toaster } from "@/components/ui/sonner";
+import { getGoogleAnalyticsHeadScripts, trackGoogleAnalyticsPageView } from "@/lib/analytics";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -113,9 +112,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleAnalyticsRouteTracker />
+      <NetworkStatusNotifier />
       <main>
         <Outlet />
       </main>
+      <Toaster position="top-right" gap={10} offset={16} mobileOffset={12} visibleToasts={2} />
     </QueryClientProvider>
   );
 }

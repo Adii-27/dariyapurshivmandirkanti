@@ -69,7 +69,10 @@ const MAPS_URL = "https://maps.app.goo.gl/AwKW2occqHKrJVA9A";
 const YOUTUBE_URL = "https://youtube.com/@dariyapurshivmandirkanti";
 const DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${TEMPLE_LAT},${TEMPLE_LNG}`;
 const MAP_EMBED_URL = `https://www.google.com/maps?q=${TEMPLE_LAT},${TEMPLE_LNG}&z=16&output=embed`;
-const MAP_LOAD_TIMEOUT_MS = 8000;
+const MAP_LOAD_TIMEOUT_MS = 15000;
+const MAP_INTERSECTION_ROOT_MARGIN = "300px 0px";
+const IN_APP_BROWSER_PATTERN =
+  /Instagram|FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|Line\/|Twitter|MicroMessenger|LinkedInApp|WhatsApp/i;
 const DEVOTIONAL_QUOTES = [
   "ॐ नमः शिवाय",
   "हर हर महादेव",
@@ -100,6 +103,12 @@ const LANDMARKS = [
     icon: Building2,
   },
 ];
+
+type MapEmbedState = "loading" | "loaded" | "fallback";
+
+function isKnownInAppBrowser(userAgent: string) {
+  return IN_APP_BROWSER_PATTERN.test(userAgent);
+}
 
 export function Location() {
   return (
@@ -309,52 +318,145 @@ export function Location() {
 }
 
 function GoogleMapEmbed() {
-  const [showFallback, setShowFallback] = useState(false);
-  const hasLoaded = useRef(false);
+  const [mapState, setMapState] = useState<MapEmbedState>("loading");
+  const [shouldRenderMap, setShouldRenderMap] = useState(false);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const hasResolved = useRef(false);
+  const hasStartedRendering = useRef(false);
   const timeoutRef = useRef<number | null>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   useEffect(() => {
-    const userAgent = window.navigator.userAgent;
-    const isInAppBrowser = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|Line|Twitter/i.test(
-      userAgent,
-    );
+    const clearLoadTimeout = () => {
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+    };
 
-    if (isInAppBrowser) {
-      setShowFallback(true);
+    const resolveAsFallback = () => {
+      if (hasResolved.current) return;
+      hasResolved.current = true;
+      clearLoadTimeout();
+      setShouldRenderMap(false);
+      setMapState("fallback");
+    };
+
+    const startLoadTimeout = () => {
+      clearLoadTimeout();
+      timeoutRef.current = window.setTimeout(resolveAsFallback, MAP_LOAD_TIMEOUT_MS);
+    };
+
+    const renderMap = () => {
+      if (hasResolved.current || hasStartedRendering.current) return;
+      hasStartedRendering.current = true;
+      setShouldRenderMap(true);
+      startLoadTimeout();
+    };
+
+    const userAgent = window.navigator.userAgent || "";
+
+    if (isKnownInAppBrowser(userAgent)) {
+      resolveAsFallback();
       return;
     }
 
-    timeoutRef.current = window.setTimeout(() => {
-      if (!hasLoaded.current) setShowFallback(true);
-    }, MAP_LOAD_TIMEOUT_MS);
+    const container = mapContainerRef.current;
+
+    if (!container || !("IntersectionObserver" in window)) {
+      renderMap();
+      return () => clearLoadTimeout();
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        renderMap();
+        observer.disconnect();
+        observerRef.current = null;
+      },
+      { rootMargin: MAP_INTERSECTION_ROOT_MARGIN, threshold: 0.01 },
+    );
+
+    observer.observe(container);
+    observerRef.current = observer;
 
     return () => {
-      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+      clearLoadTimeout();
+      observerRef.current?.disconnect();
+      observerRef.current = null;
     };
   }, []);
 
   const handleMapLoad = () => {
-    hasLoaded.current = true;
-    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
-    setShowFallback(false);
+    if (hasResolved.current) return;
+    hasResolved.current = true;
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    observerRef.current?.disconnect();
+    observerRef.current = null;
+    setMapState("loaded");
+  };
+
+  const handleMapError = () => {
+    if (hasResolved.current) return;
+    hasResolved.current = true;
+    if (timeoutRef.current !== null) {
+      window.clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+    setShouldRenderMap(false);
+    setMapState("fallback");
   };
 
   return (
-    <div className="relative min-h-[360px] w-full flex-1 bg-cream/45 sm:min-h-[450px]">
-      {!showFallback && (
+    <div
+      ref={mapContainerRef}
+      className="relative min-h-[360px] w-full flex-1 overflow-hidden bg-cream/45 sm:min-h-[450px]"
+    >
+      {shouldRenderMap && (
         <iframe
           src={MAP_EMBED_URL}
           title="Google Map showing Dariyapur Shiv Mandir Kanti"
-          loading="lazy"
+          loading="eager"
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen
           onLoad={handleMapLoad}
-          onError={() => setShowFallback(true)}
-          className="absolute inset-0 h-full w-full border-0"
+          onError={handleMapError}
+          aria-label="Interactive Google Map for Dariyapur Shiv Mandir Kanti"
+          className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-300 ${
+            mapState === "loaded" ? "opacity-100" : "opacity-0"
+          }`}
         />
       )}
 
-      {showFallback && <MapFallbackCard />}
+      {mapState === "loading" && <MapLoadingState />}
+      {mapState === "fallback" && <MapFallbackCard />}
+    </div>
+  );
+}
+
+function MapLoadingState() {
+  return (
+    <div
+      className="absolute inset-0 grid place-items-center px-5 py-8 text-center sm:px-8"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading Google Map"
+    >
+      <div className="flex w-full max-w-sm flex-col items-center rounded-2xl border border-gold/30 bg-card/80 p-6 shadow-sacred backdrop-blur sm:p-8">
+        <div className="grid h-14 w-14 place-items-center rounded-2xl border border-gold/50 bg-cream text-saffron-deep">
+          <span className="h-7 w-7 animate-spin rounded-full border-2 border-saffron-deep/25 border-t-saffron-deep" />
+        </div>
+        <p className="mt-5 font-display text-xl font-bold text-ink sm:text-2xl">
+          Loading Temple Map
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
+          Preparing the interactive Google Map.
+        </p>
+      </div>
     </div>
   );
 }
@@ -362,32 +464,34 @@ function GoogleMapEmbed() {
 function MapFallbackCard() {
   return (
     <div
-      className="absolute inset-0 grid place-items-center px-5 py-8 sm:px-8"
+      className="absolute inset-0 grid place-items-center px-4 py-6 text-center sm:px-8"
       role="status"
       aria-live="polite"
     >
-      <div className="w-full max-w-md rounded-2xl border border-gold/40 bg-card/95 p-6 text-center shadow-sacred backdrop-blur sm:p-8">
+      <div className="w-full max-w-md rounded-2xl border border-gold/40 bg-card/95 p-5 shadow-sacred backdrop-blur sm:p-8">
         <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-gold/50 bg-cream text-saffron-deep">
           <MapPin className="h-7 w-7" aria-hidden="true" />
         </div>
-        <h3 className="mt-5 font-display text-2xl font-bold text-ink">Temple Location</h3>
+        <h3 className="mt-5 font-display text-xl font-bold text-ink sm:text-2xl">
+          Temple Location
+        </h3>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
           The interactive map is unavailable in this browser.
         </p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Some apps (Instagram, Facebook, etc.) may block embedded maps.
+          Some apps (Instagram, Facebook, Messenger, etc.) may block embedded maps.
         </p>
         <a
           href={MAPS_URL}
           target="_blank"
           rel="noreferrer"
           aria-label="Open Dariyapur Shiv Mandir Kanti in Google Maps"
-          className="interactive-surface mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl gradient-saffron px-5 text-sm font-semibold text-primary-foreground shadow-sacred"
+          className="interactive-surface mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl gradient-saffron px-5 text-sm font-semibold text-primary-foreground shadow-sacred sm:w-auto"
         >
           Open Google Maps
           <ExternalLink className="h-4 w-4" aria-hidden="true" />
         </a>
-        <address className="mt-5 not-italic text-sm leading-relaxed text-ink/75 sm:text-base">
+        <address className="mt-5 break-words not-italic text-sm leading-relaxed text-ink/75 sm:text-base">
           <span className="block font-semibold text-ink">Dariyapur Shiv Mandir Kanti</span>
           <span className="block">Dariyapur, Kanti, Muzaffarpur, Bihar</span>
         </address>
