@@ -69,6 +69,7 @@ const MAPS_URL = "https://maps.app.goo.gl/AwKW2occqHKrJVA9A";
 const YOUTUBE_URL = "https://youtube.com/@dariyapurshivmandirkanti";
 const DIRECTIONS_URL = `https://www.google.com/maps/dir/?api=1&destination=${TEMPLE_LAT},${TEMPLE_LNG}`;
 const MAP_EMBED_URL = `https://www.google.com/maps?q=${TEMPLE_LAT},${TEMPLE_LNG}&z=16&output=embed`;
+const MAP_LOAD_TIMEOUT_MS = 8000;
 const DEVOTIONAL_QUOTES = [
   "ॐ नमः शिवाय",
   "हर हर महादेव",
@@ -155,14 +156,7 @@ export function Location() {
               </a>
             </div>
           </div>
-          <iframe
-            src={MAP_EMBED_URL}
-            title="Google Map showing Dariyapur Shiv Mandir Kanti"
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            allowFullScreen
-            className="min-h-[360px] w-full flex-1 border-0 sm:min-h-[450px]"
-          />
+          <GoogleMapEmbed />
         </motion.div>
 
         <motion.div
@@ -311,6 +305,94 @@ export function Location() {
         </a>
       </div>
     </Section>
+  );
+}
+
+function GoogleMapEmbed() {
+  const [showFallback, setShowFallback] = useState(false);
+  const hasLoaded = useRef(false);
+  const timeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent;
+    const isInAppBrowser = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|FB4A|Messenger|Line|Twitter/i.test(
+      userAgent,
+    );
+
+    if (isInAppBrowser) {
+      setShowFallback(true);
+      return;
+    }
+
+    timeoutRef.current = window.setTimeout(() => {
+      if (!hasLoaded.current) setShowFallback(true);
+    }, MAP_LOAD_TIMEOUT_MS);
+
+    return () => {
+      if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  const handleMapLoad = () => {
+    hasLoaded.current = true;
+    if (timeoutRef.current !== null) window.clearTimeout(timeoutRef.current);
+    setShowFallback(false);
+  };
+
+  return (
+    <div className="relative min-h-[360px] w-full flex-1 bg-cream/45 sm:min-h-[450px]">
+      {!showFallback && (
+        <iframe
+          src={MAP_EMBED_URL}
+          title="Google Map showing Dariyapur Shiv Mandir Kanti"
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          allowFullScreen
+          onLoad={handleMapLoad}
+          onError={() => setShowFallback(true)}
+          className="absolute inset-0 h-full w-full border-0"
+        />
+      )}
+
+      {showFallback && <MapFallbackCard />}
+    </div>
+  );
+}
+
+function MapFallbackCard() {
+  return (
+    <div
+      className="absolute inset-0 grid place-items-center px-5 py-8 sm:px-8"
+      role="status"
+      aria-live="polite"
+    >
+      <div className="w-full max-w-md rounded-2xl border border-gold/40 bg-card/95 p-6 text-center shadow-sacred backdrop-blur sm:p-8">
+        <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-gold/50 bg-cream text-saffron-deep">
+          <MapPin className="h-7 w-7" aria-hidden="true" />
+        </div>
+        <h3 className="mt-5 font-display text-2xl font-bold text-ink">Temple Location</h3>
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
+          The interactive map is unavailable in this browser.
+        </p>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
+          Some apps (Instagram, Facebook, etc.) may block embedded maps.
+        </p>
+        <a
+          href={MAPS_URL}
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Open Dariyapur Shiv Mandir Kanti in Google Maps"
+          className="interactive-surface mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-xl gradient-saffron px-5 text-sm font-semibold text-primary-foreground shadow-sacred"
+        >
+          Open Google Maps
+          <ExternalLink className="h-4 w-4" aria-hidden="true" />
+        </a>
+        <address className="mt-5 not-italic text-sm leading-relaxed text-ink/75 sm:text-base">
+          <span className="block font-semibold text-ink">Dariyapur Shiv Mandir Kanti</span>
+          <span className="block">Dariyapur, Kanti, Muzaffarpur, Bihar</span>
+        </address>
+      </div>
+    </div>
   );
 }
 
