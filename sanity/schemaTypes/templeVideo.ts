@@ -1,6 +1,7 @@
 import { PlayIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
 import { getVideoCategoryTitle, VIDEO_CATEGORIES } from "../studioOptions";
+import { schedulePublishField } from "./schedulePublishField";
 
 export const templeVideo = defineType({
   name: "templeVideo",
@@ -69,6 +70,7 @@ export const templeVideo = defineType({
       validation: (rule) =>
         rule.required().min(3).max(500).error("Description is required before publishing."),
     }),
+    schedulePublishField,
     defineField({
       name: "date",
       title: "Date",

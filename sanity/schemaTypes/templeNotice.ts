@@ -1,5 +1,6 @@
 import { BellIcon } from "@sanity/icons";
 import { defineField, defineType } from "sanity";
+import { schedulePublishField } from "./schedulePublishField";
 
 export const templeNotice = defineType({
   name: "templeNotice",
@@ -46,6 +47,7 @@ export const templeNotice = defineType({
       hidden: true,
       readOnly: true,
     }),
+    schedulePublishField,
   ],
   orderings: [
     {

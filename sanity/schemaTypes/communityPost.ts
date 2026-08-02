@@ -1,5 +1,6 @@
 import { UsersIcon } from "@sanity/icons";
 import { defineArrayMember, defineField, defineType } from "sanity";
+import { schedulePublishField } from "./schedulePublishField";
 
 export const communityPost = defineType({
   name: "communityPost",
@@ -84,6 +85,7 @@ export const communityPost = defineType({
       hidden: true,
       readOnly: true,
     }),
+    schedulePublishField,
     defineField({
       name: "featured",
       title: "⭐ Feature this Post",

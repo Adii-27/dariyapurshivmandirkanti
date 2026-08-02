@@ -66,8 +66,10 @@ type RawCmsResponse = {
   notices: RawTempleNotice[];
 };
 
+const PUBLIC_PUBLISH_FILTER = "(!defined(publishAt) || publishAt <= now())";
+
 const CMS_QUERY = `{
-  "gallery": *[_type == "galleryItem"] | order(featured desc, date desc)[0...100] {
+  "gallery": *[_type == "galleryItem" && ${PUBLIC_PUBLISH_FILTER}] | order(featured desc, date desc)[0...100] {
     _id,
     "title": coalesce(title, image.alt, image.asset->originalFilename, "Temple Photo"),
     image,
@@ -76,7 +78,7 @@ const CMS_QUERY = `{
     "date": coalesce(date, _createdAt),
     featured
   },
-  "videos": *[_type == "templeVideo"] | order(featured desc, date desc)[0...60] {
+  "videos": *[_type == "templeVideo" && ${PUBLIC_PUBLISH_FILTER}] | order(featured desc, date desc)[0...60] {
     _id, title, videoUrl, thumbnail, category,
     "description": coalesce(description, title),
     "date": coalesce(date, _createdAt),
@@ -84,6 +86,7 @@ const CMS_QUERY = `{
   },
   "communityPosts": *[
     _type == "communityPost" &&
+    ${PUBLIC_PUBLISH_FILTER} &&
     coalesce(published, true) == true &&
     coalesce(date, _createdAt) <= now()
   ] | order(date desc)[0...40] {
@@ -94,6 +97,7 @@ const CMS_QUERY = `{
   },
   "notices": *[
     _type == "templeNotice" &&
+    ${PUBLIC_PUBLISH_FILTER} &&
     coalesce(published, true) == true &&
     coalesce(date, _createdAt) <= now()
   ] | order(date desc)[0...40] {

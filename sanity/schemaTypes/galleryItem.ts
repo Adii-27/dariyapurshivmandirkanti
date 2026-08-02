@@ -2,6 +2,7 @@ import { ImageIcon } from "@sanity/icons";
 import { defineArrayMember, defineField, defineType } from "sanity";
 import { SingleCategoryInput } from "../components/SingleCategoryInput";
 import { GALLERY_CATEGORIES, getGalleryCategoryTitle } from "../studioOptions";
+import { schedulePublishField } from "./schedulePublishField";
 
 export const galleryItem = defineType({
   name: "galleryItem",
@@ -57,6 +58,7 @@ export const galleryItem = defineType({
       validation: (rule) =>
         rule.required().min(3).max(400).error("Description is required before publishing."),
     }),
+    schedulePublishField,
     defineField({
       name: "date",
       title: "Date",
