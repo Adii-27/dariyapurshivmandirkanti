@@ -4,6 +4,7 @@ export type SeoPage = {
   title: string;
   description: string;
   path: string;
+  breadcrumbLabel: string;
 };
 
 export const SEO_PAGES = {
@@ -12,48 +13,56 @@ export const SEO_PAGES = {
     description:
       "Official website of Dariyapur Shiv Mandir Kanti. Explore temple history, festivals, devotional music, gallery, seva opportunities, visitor information, temple location, and community updates.",
     path: "/",
+    breadcrumbLabel: "Home",
   },
   about: {
     title: "About Dariyapur Shiv Mandir Kanti",
     description:
       "Learn about the history, spiritual significance, traditions, and community activities of Dariyapur Shiv Mandir Kanti.",
     path: "/about",
+    breadcrumbLabel: "About",
   },
   gallery: {
     title: "Temple Gallery | Dariyapur Shiv Mandir Kanti",
     description:
       "Explore photos of temple festivals, celebrations, rituals, and sacred moments from Dariyapur Shiv Mandir Kanti.",
     path: "/gallery",
+    breadcrumbLabel: "Gallery",
   },
   sangeet: {
     title: "Shiv Bhajans & Sangeet | Dariyapur Shiv Mandir Kanti",
     description:
       "Listen to devotional Shiv bhajans, temple sangeet, and spiritual music shared by Dariyapur Shiv Mandir Kanti.",
     path: "/sangeet",
+    breadcrumbLabel: "Sangeet",
   },
   seva: {
     title: "Temple Seva | Dariyapur Shiv Mandir Kanti",
     description:
       "Learn about seva opportunities and ways to contribute to temple activities and community service.",
     path: "/seva",
+    breadcrumbLabel: "Seva",
   },
   visitorInformation: {
     title: "Visitor Information | Dariyapur Shiv Mandir Kanti",
     description:
       "Plan your visit to Dariyapur Shiv Mandir Kanti with temple information, guidelines, and visitor details.",
     path: "/visitor-information",
+    breadcrumbLabel: "Visitor Information",
   },
   location: {
     title: "Temple Location | Dariyapur Shiv Mandir Kanti",
     description:
       "Find the location of Dariyapur Shiv Mandir Kanti and get directions for your temple visit.",
     path: "/location",
+    breadcrumbLabel: "Location",
   },
   contact: {
     title: "Contact Us | Dariyapur Shiv Mandir Kanti",
     description:
       "Contact Dariyapur Shiv Mandir Kanti for temple inquiries, events, seva information, and community support.",
     path: "/contact",
+    breadcrumbLabel: "Contact Us",
   },
 } satisfies Record<string, SeoPage>;
 
@@ -77,6 +86,7 @@ export function createSeoHead(page: SeoPage) {
     meta: [
       { title: page.title },
       { name: "description", content: page.description },
+      { name: "robots", content: "index,follow" },
       { property: "og:title", content: page.title },
       { property: "og:description", content: page.description },
       { property: "og:image", content: imageUrl },
@@ -94,7 +104,7 @@ export function createSeoHead(page: SeoPage) {
     scripts: [
       {
         type: "application/ld+json",
-        children: JSON.stringify(createStructuredData(page, canonicalUrl, imageUrl)),
+        children: serializeJsonLd(createStructuredData(page, canonicalUrl, imageUrl)),
       },
     ],
   };
@@ -104,6 +114,7 @@ function createStructuredData(page: SeoPage, canonicalUrl: string, imageUrl: str
   const siteUrl = getSiteUrl();
   const organizationId = `${siteUrl}/#organization`;
   const templeId = `${siteUrl}/#temple`;
+  const websiteId = `${siteUrl}/#website`;
   const address = {
     "@type": "PostalAddress",
     ...siteConfig.address,
@@ -143,7 +154,7 @@ function createStructuredData(page: SeoPage, canonicalUrl: string, imageUrl: str
       },
       {
         "@type": "WebSite",
-        "@id": `${siteUrl}/#website`,
+        "@id": websiteId,
         url: siteUrl,
         name: siteConfig.name,
         publisher: { "@id": organizationId },
@@ -154,13 +165,39 @@ function createStructuredData(page: SeoPage, canonicalUrl: string, imageUrl: str
         url: canonicalUrl,
         name: page.title,
         description: page.description,
-        isPartOf: { "@id": `${siteUrl}/#website` },
+        isPartOf: { "@id": websiteId },
         about: { "@id": templeId },
         primaryImageOfPage: {
           "@type": "ImageObject",
           url: imageUrl,
         },
       },
+      ...(page.path === "/"
+        ? []
+        : [
+            {
+              "@type": "BreadcrumbList",
+              "@id": `${canonicalUrl}#breadcrumb`,
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: SEO_PAGES.home.breadcrumbLabel,
+                  item: absoluteUrl(SEO_PAGES.home.path),
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: page.breadcrumbLabel,
+                  item: canonicalUrl,
+                },
+              ],
+            },
+          ]),
     ],
   };
+}
+
+function serializeJsonLd(data: ReturnType<typeof createStructuredData>) {
+  return JSON.stringify(data).replace(/</g, "\\u003c");
 }
