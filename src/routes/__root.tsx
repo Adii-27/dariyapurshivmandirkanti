@@ -11,6 +11,7 @@ import {
 import { useEffect, useRef, type ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { NetworkStatusNotifier } from "@/components/site/NetworkStatusNotifier";
+import { PwaServiceWorker } from "@/components/site/PwaServiceWorker";
 import { Toaster } from "@/components/ui/sonner";
 import { getGoogleAnalyticsHeadScripts, trackGoogleAnalyticsPageView } from "@/lib/analytics";
 import appCss from "../styles.css?url";
@@ -84,6 +85,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Tiro+Devanagari+Hindi&display=swap",
       },
       { rel: "icon", href: "/favicon.ico" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/icons/temple-icon-192.png" },
     ],
     scripts: getGoogleAnalyticsHeadScripts(),
   }),
@@ -112,6 +115,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <GoogleAnalyticsRouteTracker />
+      <PwaServiceWorker />
       <NetworkStatusNotifier />
       <main>
         <Outlet />
