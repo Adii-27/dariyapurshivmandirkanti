@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Download, Menu, X } from "lucide-react";
 import { TEMPLE_LOGO } from "@/lib/media";
 import {
   latestChangedAt,
   UPDATES_SEEN_EVENT,
   UPDATES_SEEN_STORAGE_KEY,
 } from "@/lib/updates-notifications";
+import { INSTALL_AVAILABLE_EVENT, REQUEST_INSTALL_EVENT } from "@/lib/push";
 
 const links = [
   { href: "/#home", label: "Home" },
@@ -23,6 +24,13 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [unseenUpdates, setUnseenUpdates] = useState(0);
+  const [canInstall, setCanInstall] = useState(false);
+
+  useEffect(() => {
+    const markInstallAvailable = () => setCanInstall(true);
+    window.addEventListener(INSTALL_AVAILABLE_EVENT, markInstallAvailable);
+    return () => window.removeEventListener(INSTALL_AVAILABLE_EVENT, markInstallAvailable);
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 30);
@@ -163,6 +171,21 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
                   </a>
                 </li>
               ))}
+              {canInstall && (
+                <li className="mt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOpen(false);
+                      window.dispatchEvent(new Event(REQUEST_INSTALL_EVENT));
+                    }}
+                    className="interactive-surface flex min-h-11 w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-sm font-medium text-saffron-deep hover:bg-gold-soft"
+                  >
+                    <Download className="h-4 w-4" />
+                    📲 Install App
+                  </button>
+                </li>
+              )}
               <li className="mt-2 border-t border-border pt-3">
                 <a
                   onClick={() => {

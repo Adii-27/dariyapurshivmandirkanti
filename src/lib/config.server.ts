@@ -20,8 +20,11 @@ export function getServerConfig() {
   return {
     nodeEnv: process.env.NODE_ENV,
     sanityReadToken: process.env.SANITY_API_READ_TOKEN,
-    // Add server-only values here, e.g.:
-    //   databaseUrl: process.env.DATABASE_URL,
-    //   stripeSecretKey: process.env.STRIPE_SECRET_KEY,
+    upstashRedisUrl: process.env.UPSTASH_REDIS_REST_URL,
+    upstashRedisToken: process.env.UPSTASH_REDIS_REST_TOKEN,
+    webPushVapidPrivateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,
+    webPushVapidSubject: process.env.WEB_PUSH_VAPID_SUBJECT,
+    sanityPushWebhookSecret: process.env.SANITY_PUSH_WEBHOOK_SECRET,
+    festivalSchedulerSecret: process.env.FESTIVAL_SCHEDULER_SECRET,
   };
 }
