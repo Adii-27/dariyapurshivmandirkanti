@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { createFileRoute } from "@tanstack/react-router";
 import {
   deliverPush,
@@ -86,6 +87,17 @@ function batchPayload(documents: SanityPushDocument[]) {
       };
 }
 
+function resolveIdempotencyKey(request: Request, rawBody: string): string {
+  const headerKey =
+    request.headers.get("idempotency-key") ||
+    request.headers.get("sanity-transaction-id") ||
+    request.headers.get("sanity-webhook-id");
+  if (headerKey && headerKey.trim().length > 0) {
+    return headerKey.trim();
+  }
+  return createHash("sha256").update(rawBody).digest("hex");
+}
+
 export const Route = createFileRoute("/api/push/sanity")({
   server: {
     handlers: {
@@ -94,13 +106,13 @@ export const Route = createFileRoute("/api/push/sanity")({
         if (!verifySanityWebhook(rawBody, request.headers.get("sanity-webhook-signature"))) {
           return Response.json({ error: "Invalid webhook signature" }, { status: 401 });
         }
-        const idempotencyKey = request.headers.get("idempotency-key");
-        if (!idempotencyKey)
-          return Response.json({ error: "Missing idempotency key" }, { status: 400 });
-        if ((await reserveWebhook(idempotencyKey)) !== "OK")
-          return Response.json({ ok: true, duplicate: true });
+        const idempotencyKey = resolveIdempotencyKey(request, rawBody);
 
         try {
+          if ((await reserveWebhook(idempotencyKey)) !== "OK") {
+            return Response.json({ ok: true, duplicate: true });
+          }
+
           const webhook = JSON.parse(rawBody) as SanityPushWebhook;
           const documents = webhook.documents?.length ? webhook.documents : [webhook];
           const batch = batchPayload(documents);
@@ -118,9 +130,15 @@ export const Route = createFileRoute("/api/push/sanity")({
           const results = await Promise.all(payloads.map((payload) => deliverPush(payload)));
           return Response.json({ ok: true, notifications: results });
         } catch (error) {
-          await releaseWebhook(idempotencyKey);
+          try {
+            await releaseWebhook(idempotencyKey);
+          } catch {
+            // Ignore release failure if storage is down
+          }
+          const message = error instanceof Error ? error.message : "Push delivery failed";
+          const status = message.includes("not configured") ? 503 : 502;
           console.error("Sanity push delivery failed", error);
-          return Response.json({ error: "Push delivery failed" }, { status: 502 });
+          return Response.json({ error: message }, { status });
         }
       },
     },
