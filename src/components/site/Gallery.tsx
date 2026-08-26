@@ -120,8 +120,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
             <img
               src={photo.src}
               alt={photo.caption}
-              loading={index < 4 ? "eager" : "lazy"}
-              fetchPriority={index < 2 ? "high" : "auto"}
+              loading="lazy"
               decoding="async"
               className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
             />

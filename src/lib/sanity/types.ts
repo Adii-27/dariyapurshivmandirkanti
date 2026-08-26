@@ -1,4 +1,5 @@
 import type { TemplePhoto, TempleVideo } from "@/lib/media";
+import type { TempleFaq } from "@/lib/faq";
 import type { FestivalUpdate, TempleUpdate } from "@/lib/updates";
 
 export type CmsContent = {
@@ -6,4 +7,5 @@ export type CmsContent = {
   videos: TempleVideo[];
   festivals: FestivalUpdate[];
   updates: TempleUpdate[];
+  faqs: TempleFaq[];
 };

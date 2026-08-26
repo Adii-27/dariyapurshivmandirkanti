@@ -507,7 +507,9 @@ export function Contact() {
   const [emailCopied, setEmailCopied] = useState(false);
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [quotePaused, setQuotePaused] = useState(false);
+  const [quoteVisible, setQuoteVisible] = useState(false);
   const submittingRef = useRef(false);
+  const quoteRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!emailCopied) return;
@@ -516,12 +518,32 @@ export function Contact() {
   }, [emailCopied]);
 
   useEffect(() => {
-    if (quotePaused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const el = quoteRef.current;
+    if (!el || !("IntersectionObserver" in window)) {
+      setQuoteVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setQuoteVisible(Boolean(entry?.isIntersecting)),
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (
+      !quoteVisible ||
+      quotePaused ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
     const interval = window.setInterval(() => {
       setQuoteIndex((current) => (current + 1) % DEVOTIONAL_QUOTES.length);
     }, 4500);
     return () => window.clearInterval(interval);
-  }, [quotePaused]);
+  }, [quotePaused, quoteVisible]);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -684,6 +706,7 @@ export function Contact() {
             external
           />
           <motion.div
+            ref={quoteRef}
             initial={{ opacity: 0, scale: 0.98, y: 8 }}
             whileInView={{ opacity: 1, scale: 1, y: 0 }}
             viewport={{ once: true }}

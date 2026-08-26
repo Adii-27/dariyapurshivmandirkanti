@@ -33,12 +33,18 @@ export const Route = createFileRoute("/api/push/subscribe")({
         if (!validSubscription(body)) {
           return Response.json({ error: "Invalid subscription" }, { status: 400 });
         }
-        await saveSubscription({
-          endpoint: body.endpoint,
-          expirationTime: typeof body.expirationTime === "number" ? body.expirationTime : null,
-          keys: { p256dh: body.keys.p256dh, auth: body.keys.auth },
-        });
-        return Response.json({ ok: true }, { status: 201 });
+        try {
+          await saveSubscription({
+            endpoint: body.endpoint,
+            expirationTime: typeof body.expirationTime === "number" ? body.expirationTime : null,
+            keys: { p256dh: body.keys.p256dh, auth: body.keys.auth },
+          });
+          return Response.json({ ok: true }, { status: 201 });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Failed to save subscription";
+          const status = message.includes("not configured") ? 503 : 500;
+          return Response.json({ error: message }, { status });
+        }
       },
       DELETE: async ({ request }) => {
         let body: { endpoint?: unknown };
@@ -50,8 +56,14 @@ export const Route = createFileRoute("/api/push/subscribe")({
         if (typeof body.endpoint !== "string" || !body.endpoint.startsWith("https://")) {
           return Response.json({ error: "Invalid request" }, { status: 400 });
         }
-        await deleteSubscription(body.endpoint);
-        return new Response(null, { status: 204 });
+        try {
+          await deleteSubscription(body.endpoint);
+          return new Response(null, { status: 204 });
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Failed to delete subscription";
+          const status = message.includes("not configured") ? 503 : 500;
+          return Response.json({ error: message }, { status });
+        }
       },
     },
   },

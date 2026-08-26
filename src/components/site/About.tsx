@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Landmark, MapPin, Clock, HeartHandshake } from "lucide-react";
 import { Section } from "./Section";
@@ -24,12 +24,28 @@ const infoCards = [
 export function About() {
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const slideshowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 2000);
+    const el = slideshowRef.current;
+    if (!el || !("IntersectionObserver" in window)) {
+      setIsVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(Boolean(entry?.isIntersecting)),
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible || paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 3000);
     return () => clearInterval(t);
-  }, [paused]);
+  }, [isVisible, paused]);
 
   return (
     <Section id="about" className="bg-secondary/40">
@@ -81,6 +97,7 @@ export function About() {
         {/* Right: slideshow + info cards */}
         <div>
           <motion.div
+            ref={slideshowRef}
             initial={{ opacity: 0, scale: 0.96 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-100px" }}

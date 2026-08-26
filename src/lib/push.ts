@@ -25,7 +25,7 @@ export function base64UrlToUint8Array(value: string) {
 
 export function canUseWebPush() {
   return (
-    import.meta.env.PROD &&
+    typeof window !== "undefined" &&
     "serviceWorker" in navigator &&
     "PushManager" in window &&
     "Notification" in window &&

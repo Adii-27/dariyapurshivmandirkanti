@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, ChevronLeft, ChevronRight, Sparkles, X } from "lucide-react";
 import type { FestivalUpdate } from "@/lib/updates";
@@ -192,9 +192,26 @@ export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) 
 function UpcomingFestivalSlider({ festivals }: { festivals: FestivalUpdate[] }) {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || !("IntersectionObserver" in window)) {
+      setIsVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(Boolean(entry?.isIntersecting)),
+      { threshold: 0.1 },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (
+      !isVisible ||
       paused ||
       festivals.length < 2 ||
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -203,10 +220,10 @@ function UpcomingFestivalSlider({ festivals }: { festivals: FestivalUpdate[] }) 
     }
     const interval = window.setInterval(
       () => setIndex((current) => (current + 1) % festivals.length),
-      3000,
+      3500,
     );
     return () => window.clearInterval(interval);
-  }, [festivals.length, paused]);
+  }, [festivals.length, isVisible, paused]);
 
   useEffect(() => {
     if (index >= festivals.length) setIndex(0);
@@ -216,6 +233,7 @@ function UpcomingFestivalSlider({ festivals }: { festivals: FestivalUpdate[] }) 
 
   return (
     <div
+      ref={containerRef}
       className="interactive-surface overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-gold/50 hover:shadow-sacred sm:p-6"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

@@ -2,8 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { TEMPLE_LOGO } from "@/lib/media";
 
-const VISITOR_COUNTER_URL =
-  "https://api.counterapi.dev/v1/dariyapur-shiv-mandir-kanti/website-visitors/";
+const VISITOR_COUNTER_URL = "/api/visitors";
 const VISITOR_SESSION_KEY = "dsmk-visitor-counted";
 const VISITOR_CACHE_KEY = "dsmk-visitor-count-cache";
 const VISITOR_CACHE_TTL_MS = 30 * 60 * 1000;
@@ -130,7 +129,7 @@ function loadVisitorCount() {
 
     try {
       const count = await fetchCounterValueWithRetry(
-        shouldIncrement ? `${VISITOR_COUNTER_URL}up` : VISITOR_COUNTER_URL,
+        shouldIncrement ? `${VISITOR_COUNTER_URL}?inc=1` : VISITOR_COUNTER_URL,
       );
       cacheVisitorCount(count);
       if (shouldIncrement) markCountedThisSession();
@@ -188,6 +187,7 @@ const quickLinks = [
   ["/#seva", "Seva"],
   ["/#visit", "Visitor Information"],
   ["/#location", "Location"],
+  ["/faq", "FAQ"],
   ["/#contact", "Contact Us"],
   ["/#updates", "Updates"],
 ] as const;

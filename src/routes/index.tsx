@@ -19,8 +19,7 @@ import { Visit } from "@/components/site/Visit";
 import { Contact, Location } from "@/components/site/Location";
 import { Footer } from "@/components/site/Footer";
 
-const CMS_STALE_TIME_MS = 10_000;
-const CMS_REFETCH_INTERVAL_MS = 20_000;
+const CMS_STALE_TIME_MS = 5 * 60_000;
 
 async function fetchLatestCmsContent(): Promise<CmsContent> {
   const content = await getCmsContent();
@@ -50,8 +49,6 @@ export function HomePage({
     queryFn: fetchLatestCmsContent,
     initialData: initialCms ?? undefined,
     staleTime: CMS_STALE_TIME_MS,
-    refetchInterval: CMS_REFETCH_INTERVAL_MS,
-    refetchIntervalInBackground: false,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     retry: 1,

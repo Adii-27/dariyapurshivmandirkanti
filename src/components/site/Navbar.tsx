@@ -17,6 +17,7 @@ const links = [
   { href: "/#seva", label: "Seva" },
   { href: "/#visit", label: "Visitor Information" },
   { href: "/#location", label: "Location" },
+  { href: "/faq", label: "FAQ" },
   { href: "/#contact", label: "Contact Us" },
 ];
 

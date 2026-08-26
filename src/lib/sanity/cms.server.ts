@@ -3,6 +3,7 @@ import { createImageUrlBuilder } from "@sanity/image-url";
 import { getServerConfig } from "@/lib/config.server";
 import { generateHinduFestivals } from "@/lib/hindu-festivals";
 import type { GalleryCategory, TemplePhoto, TempleVideo, VideoCategory } from "@/lib/media";
+import { FAQ_CATEGORIES, type FaqCategory, type TempleFaq } from "@/lib/faq";
 import type { FestivalUpdate, TempleUpdate, TempleUpdateCategory } from "@/lib/updates";
 import type { CmsContent } from "./types";
 
@@ -59,11 +60,21 @@ type RawTempleNotice = {
   _updatedAt: string;
 };
 
+type RawFaq = {
+  _id: string;
+  question?: string;
+  answer?: string;
+  category?: string;
+  order?: number;
+  featured?: boolean;
+};
+
 type RawCmsResponse = {
   gallery: RawGalleryItem[];
   videos: RawTempleVideo[];
   communityPosts: RawCommunityPost[];
   notices: RawTempleNotice[];
+  faqs: RawFaq[];
 };
 
 const PUBLIC_PUBLISH_FILTER = "(!defined(publishAt) || publishAt <= now())";
@@ -104,6 +115,9 @@ const CMS_QUERY = `{
     _id, _updatedAt, title, noticeContent,
     "date": coalesce(date, _createdAt),
     featured
+  },
+  "faqs": *[_type == "faq" && ${PUBLIC_PUBLISH_FILTER}] | order(featured desc, order asc, question asc)[0...100] {
+    _id, question, answer, category, order, featured
   }
 }`;
 
@@ -206,7 +220,7 @@ async function fetchCmsContentFromSanity(): Promise<CmsContent | null> {
   const dataset = import.meta.env.VITE_SANITY_DATASET?.trim() || "production";
 
   const festivals = generateHinduFestivals();
-  if (!projectId) return { gallery: [], videos: [], festivals, updates: [] };
+  if (!projectId) return { gallery: [], videos: [], festivals, updates: [], faqs: [] };
 
   const serverConfig = getServerConfig();
   const token = serverConfig.sanityReadToken;
@@ -305,7 +319,25 @@ async function fetchCmsContentFromSanity(): Promise<CmsContent | null> {
         .filter((update): update is TempleUpdate => Boolean(update)),
     ]);
 
-    return { gallery, videos, festivals, updates };
+    const faqs = raw.faqs
+      .map((item): TempleFaq | null => {
+        const category = item.category as FaqCategory | undefined;
+        if (!item.question || !item.answer || !category || !FAQ_CATEGORIES.includes(category)) {
+          return null;
+        }
+
+        return {
+          id: item._id,
+          question: normalizeContent(item.question),
+          answer: normalizeContent(item.answer),
+          category,
+          order: item.order,
+          featured: Boolean(item.featured),
+        };
+      })
+      .filter((item): item is TempleFaq => Boolean(item));
+
+    return { gallery, videos, festivals, updates, faqs };
   } catch {
     return null;
   } finally {

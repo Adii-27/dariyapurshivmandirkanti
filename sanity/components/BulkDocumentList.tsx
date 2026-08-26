@@ -210,9 +210,9 @@ function BulkDocumentList({ documentType, title, emptyMessage }: BulkDocumentLis
               disabled={loading || documents.length === 0 || deleting}
               onChange={toggleAll}
             />
-            <Label htmlFor={`${documentType}-select-all`}>
+            <Text as="label" size={1} weight="medium" htmlFor={`${documentType}-select-all`}>
               Select All{documents.length > 0 ? ` (${documents.length})` : ""}
-            </Label>
+            </Text>
           </Flex>
         </Card>
 

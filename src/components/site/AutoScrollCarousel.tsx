@@ -12,8 +12,9 @@ export function AutoScrollCarousel({
   className?: string;
 }) {
   const viewportRef = useRef<HTMLDivElement>(null);
-  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resumeTimerRef = useRef<number | null>(null);
   const [paused, setPaused] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(
     () => () => {
@@ -21,6 +22,21 @@ export function AutoScrollCarousel({
     },
     [],
   );
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || !("IntersectionObserver" in window)) {
+      setIsVisible(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(Boolean(entry?.isIntersecting)),
+      { threshold: 0 },
+    );
+    observer.observe(viewport);
+    return () => observer.disconnect();
+  }, []);
 
   const pauseForTouch = () => {
     setPaused(true);
@@ -34,14 +50,24 @@ export function AutoScrollCarousel({
 
   useEffect(() => {
     const viewport = viewportRef.current;
-    if (!viewport || paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      !viewport ||
+      !isVisible ||
+      paused ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       return;
     }
+
+    let midpoint = viewport.scrollWidth / 2;
+    const updateMidpoint = () => {
+      if (viewport) midpoint = viewport.scrollWidth / 2;
+    };
+    window.addEventListener("resize", updateMidpoint, { passive: true });
 
     let frame = 0;
     let position = viewport.scrollLeft;
     const tick = () => {
-      const midpoint = viewport.scrollWidth / 2;
       position += speed;
       if (midpoint > 0 && position >= midpoint) {
         position -= midpoint;
@@ -50,8 +76,11 @@ export function AutoScrollCarousel({
       frame = window.requestAnimationFrame(tick);
     };
     frame = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(frame);
-  }, [paused, speed]);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updateMidpoint);
+    };
+  }, [children.length, isVisible, paused, speed]);
 
   const items = [...children, ...children];
 

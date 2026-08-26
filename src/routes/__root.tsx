@@ -12,6 +12,8 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { NetworkStatusNotifier } from "@/components/site/NetworkStatusNotifier";
 import { PwaServiceWorker } from "@/components/site/PwaServiceWorker";
+import { NotificationInvite } from "@/components/site/NotificationInvite";
+import { PwaInstallPrompt } from "@/components/site/PwaInstallPrompt";
 import { Toaster } from "@/components/ui/sonner";
 import { getGoogleAnalyticsHeadScripts, trackGoogleAnalyticsPageView } from "@/lib/analytics";
 import appCss from "../styles.css?url";
@@ -116,6 +118,8 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <GoogleAnalyticsRouteTracker />
       <PwaServiceWorker />
+      <NotificationInvite />
+      <PwaInstallPrompt />
       <NetworkStatusNotifier />
       <main>
         <Outlet />

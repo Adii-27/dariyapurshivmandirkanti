@@ -7,6 +7,11 @@ export type SeoPage = {
   breadcrumbLabel: string;
 };
 
+type FaqStructuredDataItem = {
+  question: string;
+  answer: string;
+};
+
 export const SEO_PAGES = {
   home: {
     title: "Dariyapur Shiv Mandir Kanti | Official Temple Website",
@@ -64,6 +69,13 @@ export const SEO_PAGES = {
     path: "/contact",
     breadcrumbLabel: "Contact Us",
   },
+  faq: {
+    title: "Frequently Asked Questions | Dariyapur Shiv Mandir Kanti",
+    description:
+      "Find answers to common questions about visiting Dariyapur Shiv Mandir Kanti, temple timings, seva, festivals, and facilities.",
+    path: "/faq",
+    breadcrumbLabel: "Frequently Asked Questions",
+  },
 } satisfies Record<string, SeoPage>;
 
 function normalizeSiteUrl(value: string) {
@@ -78,7 +90,10 @@ export function absoluteUrl(path: string) {
   return new URL(path, `${getSiteUrl()}/`).toString();
 }
 
-export function createSeoHead(page: SeoPage) {
+export function createSeoHead(
+  page: SeoPage,
+  options: { faqs?: readonly FaqStructuredDataItem[] } = {},
+) {
   const canonicalUrl = absoluteUrl(page.path);
   const imageUrl = absoluteUrl(siteConfig.image);
 
@@ -104,13 +119,18 @@ export function createSeoHead(page: SeoPage) {
     scripts: [
       {
         type: "application/ld+json",
-        children: serializeJsonLd(createStructuredData(page, canonicalUrl, imageUrl)),
+        children: serializeJsonLd(createStructuredData(page, canonicalUrl, imageUrl, options.faqs)),
       },
     ],
   };
 }
 
-function createStructuredData(page: SeoPage, canonicalUrl: string, imageUrl: string) {
+function createStructuredData(
+  page: SeoPage,
+  canonicalUrl: string,
+  imageUrl: string,
+  faqs: readonly FaqStructuredDataItem[] = [],
+) {
   const siteUrl = getSiteUrl();
   const organizationId = `${siteUrl}/#organization`;
   const templeId = `${siteUrl}/#temple`;
@@ -194,6 +214,22 @@ function createStructuredData(page: SeoPage, canonicalUrl: string, imageUrl: str
               ],
             },
           ]),
+      ...(page.path === "/faq" && faqs.length > 0
+        ? [
+            {
+              "@type": "FAQPage",
+              "@id": `${canonicalUrl}#faqpage`,
+              mainEntity: faqs.map((faq) => ({
+                "@type": "Question",
+                name: faq.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: faq.answer,
+                },
+              })),
+            },
+          ]
+        : []),
     ],
   };
 }

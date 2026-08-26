@@ -14,6 +14,7 @@ const paths = [
   "/visitor-information",
   "/location",
   "/contact",
+  "/faq",
 ];
 
 const sitemap = [

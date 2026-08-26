@@ -1,4 +1,12 @@
-import { BellIcon, CalendarIcon, ImagesIcon, PlayIcon, UploadIcon, UsersIcon } from "@sanity/icons";
+import {
+  BellIcon,
+  CalendarIcon,
+  HelpCircleIcon,
+  ImagesIcon,
+  PlayIcon,
+  UploadIcon,
+  UsersIcon,
+} from "@sanity/icons";
 import type { StructureResolver } from "sanity/structure";
 import {
   CommunityPostBulkDocumentList,
@@ -70,4 +78,5 @@ export const structure: StructureResolver = (S) =>
             .id("temple-notice-bulk-document-list")
             .title("Temple Notices"),
         ),
+      S.documentTypeListItem("faq").title("❓ FAQs").icon(HelpCircleIcon),
     ]);

@@ -15,9 +15,14 @@ import { Route as SevaRouteImport } from './routes/seva'
 import { Route as SangeetRouteImport } from './routes/sangeet'
 import { Route as LocationRouteImport } from './routes/location'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ApiVisitorsRouteImport } from './routes/api/visitors'
+import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
+import { Route as ApiPushSanityRouteImport } from './routes/api/push/sanity'
+import { Route as ApiPushFestivalsRunRouteImport } from './routes/api/push/festivals/run'
 
 const VisitorInformationRoute = VisitorInformationRouteImport.update({
   id: '/visitor-information',
@@ -49,6 +54,11 @@ const GalleryRoute = GalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -64,40 +74,75 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiVisitorsRoute = ApiVisitorsRouteImport.update({
+  id: '/api/visitors',
+  path: '/api/visitors',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
+  id: '/api/push/subscribe',
+  path: '/api/push/subscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushSanityRoute = ApiPushSanityRouteImport.update({
+  id: '/api/push/sanity',
+  path: '/api/push/sanity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushFestivalsRunRoute = ApiPushFestivalsRunRouteImport.update({
+  id: '/api/push/festivals/run',
+  path: '/api/push/festivals/run',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/location': typeof LocationRoute
   '/sangeet': typeof SangeetRoute
   '/seva': typeof SevaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visitor-information': typeof VisitorInformationRoute
+  '/api/visitors': typeof ApiVisitorsRoute
+  '/api/push/sanity': typeof ApiPushSanityRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/festivals/run': typeof ApiPushFestivalsRunRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/location': typeof LocationRoute
   '/sangeet': typeof SangeetRoute
   '/seva': typeof SevaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visitor-information': typeof VisitorInformationRoute
+  '/api/visitors': typeof ApiVisitorsRoute
+  '/api/push/sanity': typeof ApiPushSanityRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/festivals/run': typeof ApiPushFestivalsRunRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
   '/location': typeof LocationRoute
   '/sangeet': typeof SangeetRoute
   '/seva': typeof SevaRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/visitor-information': typeof VisitorInformationRoute
+  '/api/visitors': typeof ApiVisitorsRoute
+  '/api/push/sanity': typeof ApiPushSanityRoute
+  '/api/push/subscribe': typeof ApiPushSubscribeRoute
+  '/api/push/festivals/run': typeof ApiPushFestivalsRunRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,46 +150,66 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/faq'
     | '/gallery'
     | '/location'
     | '/sangeet'
     | '/seva'
     | '/sitemap.xml'
     | '/visitor-information'
+    | '/api/visitors'
+    | '/api/push/sanity'
+    | '/api/push/subscribe'
+    | '/api/push/festivals/run'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/contact'
+    | '/faq'
     | '/gallery'
     | '/location'
     | '/sangeet'
     | '/seva'
     | '/sitemap.xml'
     | '/visitor-information'
+    | '/api/visitors'
+    | '/api/push/sanity'
+    | '/api/push/subscribe'
+    | '/api/push/festivals/run'
   id:
     | '__root__'
     | '/'
     | '/about'
     | '/contact'
+    | '/faq'
     | '/gallery'
     | '/location'
     | '/sangeet'
     | '/seva'
     | '/sitemap.xml'
     | '/visitor-information'
+    | '/api/visitors'
+    | '/api/push/sanity'
+    | '/api/push/subscribe'
+    | '/api/push/festivals/run'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
+  FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
   LocationRoute: typeof LocationRoute
   SangeetRoute: typeof SangeetRoute
   SevaRoute: typeof SevaRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   VisitorInformationRoute: typeof VisitorInformationRoute
+  ApiVisitorsRoute: typeof ApiVisitorsRoute
+  ApiPushSanityRoute: typeof ApiPushSanityRoute
+  ApiPushSubscribeRoute: typeof ApiPushSubscribeRoute
+  ApiPushFestivalsRunRoute: typeof ApiPushFestivalsRunRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -191,6 +256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -212,6 +284,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/visitors': {
+      id: '/api/visitors'
+      path: '/api/visitors'
+      fullPath: '/api/visitors'
+      preLoaderRoute: typeof ApiVisitorsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/subscribe': {
+      id: '/api/push/subscribe'
+      path: '/api/push/subscribe'
+      fullPath: '/api/push/subscribe'
+      preLoaderRoute: typeof ApiPushSubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/sanity': {
+      id: '/api/push/sanity'
+      path: '/api/push/sanity'
+      fullPath: '/api/push/sanity'
+      preLoaderRoute: typeof ApiPushSanityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/festivals/run': {
+      id: '/api/push/festivals/run'
+      path: '/api/push/festivals/run'
+      fullPath: '/api/push/festivals/run'
+      preLoaderRoute: typeof ApiPushFestivalsRunRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -219,12 +319,17 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
+  FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
   LocationRoute: LocationRoute,
   SangeetRoute: SangeetRoute,
   SevaRoute: SevaRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   VisitorInformationRoute: VisitorInformationRoute,
+  ApiVisitorsRoute: ApiVisitorsRoute,
+  ApiPushSanityRoute: ApiPushSanityRoute,
+  ApiPushSubscribeRoute: ApiPushSubscribeRoute,
+  ApiPushFestivalsRunRoute: ApiPushFestivalsRunRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
