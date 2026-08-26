@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Download, X } from "lucide-react";
 import { toast } from "sonner";
@@ -14,70 +14,82 @@ type DeferredInstallPrompt = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-const COOLDOWN_KEY = "temple-install-invite-next";
-const COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
+const INSTALL_HANDLED_KEY = "temple-install-onboarding-handled";
+const INSTALL_DELAY_MS = 36_000; // Exactly 36 seconds for new visitors
 
-function hasCooldown() {
+function isInstallHandled() {
   try {
-    return (Number(window.localStorage.getItem(COOLDOWN_KEY)) || 0) > Date.now();
+    return window.localStorage.getItem(INSTALL_HANDLED_KEY) === "true";
   } catch {
     return false;
   }
 }
 
-function setCooldown() {
+function markInstallHandled() {
   try {
-    window.localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MS));
+    window.localStorage.setItem(INSTALL_HANDLED_KEY, "true");
   } catch {
-    // The invitation remains functional when local storage is unavailable.
+    // Keep running normally if storage is blocked
   }
 }
 
 export function PwaInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<DeferredInstallPrompt | null>(null);
+  const deferredPromptRef = useRef<DeferredInstallPrompt | null>(null);
   const [visible, setVisible] = useState(false);
   const [working, setWorking] = useState(false);
 
   useEffect(() => {
-    if (!import.meta.env.PROD || isStandalonePwa()) return;
-    let interactionTimer: number | undefined;
+    if (isStandalonePwa()) return;
+
+    let timer: number | undefined;
+
     const onBeforeInstallPrompt = (event: Event) => {
       event.preventDefault();
       const prompt = event as DeferredInstallPrompt;
+      deferredPromptRef.current = prompt;
       setDeferredPrompt(prompt);
       window.dispatchEvent(new Event(INSTALL_AVAILABLE_EVENT));
+
+      // If not already handled/dismissed, schedule the 36-second one-shot timer
+      if (!isInstallHandled() && !timer) {
+        timer = window.setTimeout(() => {
+          if (!isInstallHandled() && deferredPromptRef.current) {
+            window.dispatchEvent(new CustomEvent(PROMPT_OPEN_EVENT, { detail: "install" }));
+            setVisible(true);
+          }
+        }, INSTALL_DELAY_MS);
+      }
     };
-    const open = () => {
-      if (!hasCooldown()) {
+
+    // Explicit manual request (e.g. user taps "Install App" in navigation menu)
+    const onManualRequest = () => {
+      if (deferredPromptRef.current) {
         window.dispatchEvent(new CustomEvent(PROMPT_OPEN_EVENT, { detail: "install" }));
         setVisible(true);
       }
     };
-    const onMeaningfulInteraction = () => {
-      if (!hasCooldown()) {
-        interactionTimer = window.setTimeout(open, 2_000);
+
+    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+    window.addEventListener(REQUEST_INSTALL_EVENT, onManualRequest);
+
+    const closeForAnotherPrompt = (event: Event) => {
+      if ((event as CustomEvent<string>).detail !== "install") {
+        setVisible(false);
       }
     };
-    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-    window.addEventListener("temple:meaningful-interaction", onMeaningfulInteraction, {
-      once: true,
-    });
-    window.addEventListener(REQUEST_INSTALL_EVENT, open);
-    const closeForAnotherPrompt = (event: Event) => {
-      if ((event as CustomEvent<string>).detail !== "install") setVisible(false);
-    };
     window.addEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
+
     return () => {
       window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
-      window.removeEventListener("temple:meaningful-interaction", onMeaningfulInteraction);
-      window.removeEventListener(REQUEST_INSTALL_EVENT, open);
+      window.removeEventListener(REQUEST_INSTALL_EVENT, onManualRequest);
       window.removeEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
-      if (interactionTimer) window.clearTimeout(interactionTimer);
+      if (timer) window.clearTimeout(timer);
     };
   }, []);
 
   const close = () => {
-    setCooldown();
+    markInstallHandled();
     setVisible(false);
   };
 
@@ -87,17 +99,20 @@ export function PwaInstallPrompt() {
     try {
       await deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
-      if (choice.outcome === "accepted")
+      if (choice.outcome === "accepted") {
         toast.success("Dariyapur Shiv Mandir has been added to your device.");
-      setCooldown();
+      }
+      markInstallHandled();
       setVisible(false);
       setDeferredPrompt(null);
+      deferredPromptRef.current = null;
     } finally {
       setWorking(false);
     }
   };
 
   if (!deferredPrompt) return null;
+
   return (
     <AnimatePresence>
       {visible && (

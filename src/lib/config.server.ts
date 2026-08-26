@@ -16,12 +16,48 @@ import process from "node:process";
 //     and server (analytics IDs, public URLs). Define in .env with the
 //     VITE_ prefix. Never put secrets here — they ship to the browser.
 
+function normalizeUpstashUrl(rawUrl?: string): string | undefined {
+  if (!rawUrl || typeof rawUrl !== "string") return undefined;
+  const url = rawUrl.trim().replace(/^["']|["']$/g, "").trim();
+  if (!url) return undefined;
+
+  if (url.startsWith("https://") || url.startsWith("http://")) {
+    try {
+      new URL(url);
+      return url;
+    } catch {
+      return undefined;
+    }
+  }
+
+  // If provided as a domain without protocol (e.g., xxx.upstash.io)
+  if (url.includes(".upstash.io") || url.includes("localhost") || url.includes("127.0.0.1")) {
+    const withHttps = `https://${url}`;
+    try {
+      new URL(withHttps);
+      return withHttps;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
 export function getServerConfig() {
+  const upstashRedisUrl =
+    normalizeUpstashUrl(process.env.UPSTASH_REDIS_REST_URL) ||
+    normalizeUpstashUrl(process.env.UPSTASH_REDIS_URL);
+
+  const upstashRedisToken =
+    process.env.UPSTASH_REDIS_REST_TOKEN?.trim() ||
+    process.env.UPSTASH_REDIS_TOKEN?.trim();
+
   return {
     nodeEnv: process.env.NODE_ENV,
     sanityReadToken: process.env.SANITY_API_READ_TOKEN,
-    upstashRedisUrl: process.env.UPSTASH_REDIS_REST_URL,
-    upstashRedisToken: process.env.UPSTASH_REDIS_REST_TOKEN,
+    upstashRedisUrl,
+    upstashRedisToken,
     webPushVapidPrivateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY,
     webPushVapidSubject: process.env.WEB_PUSH_VAPID_SUBJECT,
     sanityPushWebhookSecret: process.env.SANITY_PUSH_WEBHOOK_SECRET,

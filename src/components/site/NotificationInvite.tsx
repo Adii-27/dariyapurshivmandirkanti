@@ -4,21 +4,20 @@ import { Bell, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { base64UrlToUint8Array, canUseWebPush, PROMPT_OPEN_EVENT } from "@/lib/push";
 
-const COOLDOWN_KEY = "temple-notification-invite-next";
-const INTERACTION_EVENT = "temple:meaningful-interaction";
-const COOLDOWN_MS = 14 * 24 * 60 * 60 * 1000;
+const NOTIFICATION_HANDLED_KEY = "temple-notification-onboarding-handled";
+const NOTIFICATION_DELAY_MS = 12_000; // Exactly 12 seconds for new visitors
 
-function eligible() {
+function isNotificationHandled() {
   try {
-    return (Number(window.localStorage.getItem(COOLDOWN_KEY)) || 0) <= Date.now();
+    return window.localStorage.getItem(NOTIFICATION_HANDLED_KEY) === "true";
   } catch {
-    return true;
+    return false;
   }
 }
 
-function defer() {
+function markNotificationHandled() {
   try {
-    window.localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MS));
+    window.localStorage.setItem(NOTIFICATION_HANDLED_KEY, "true");
   } catch {
     // A blocked local-storage write should not prevent normal browsing.
   }
@@ -29,35 +28,46 @@ export function NotificationInvite() {
   const [working, setWorking] = useState(false);
 
   useEffect(() => {
-    if (!canUseWebPush() || Notification.permission !== "default" || !eligible()) return;
-    let interacted = false;
+    if (!canUseWebPush() || Notification.permission !== "default" || isNotificationHandled()) {
+      return;
+    }
+
     let timer: number | undefined;
-    const showWhenEligible = () => {
-      if (!interacted || document.hidden) return;
-      timer = window.setTimeout(() => {
-        window.dispatchEvent(new CustomEvent(PROMPT_OPEN_EVENT, { detail: "notifications" }));
-        setVisible(true);
-      }, 30_000);
+
+    const showPrompt = () => {
+      window.dispatchEvent(new CustomEvent(PROMPT_OPEN_EVENT, { detail: "notifications" }));
+      setVisible(true);
     };
-    const markInteraction = () => {
-      interacted = true;
-      window.dispatchEvent(new Event(INTERACTION_EVENT));
-      showWhenEligible();
-    };
-    window.addEventListener("pointerdown", markInteraction, { once: true, passive: true });
+
+    timer = window.setTimeout(() => {
+      if (document.hidden) {
+        const onVisible = () => {
+          if (!document.hidden && !isNotificationHandled()) {
+            showPrompt();
+            document.removeEventListener("visibilitychange", onVisible);
+          }
+        };
+        document.addEventListener("visibilitychange", onVisible);
+        return;
+      }
+      showPrompt();
+    }, NOTIFICATION_DELAY_MS);
+
     const closeForAnotherPrompt = (event: Event) => {
-      if ((event as CustomEvent<string>).detail !== "notifications") setVisible(false);
+      if ((event as CustomEvent<string>).detail !== "notifications") {
+        setVisible(false);
+      }
     };
     window.addEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
+
     return () => {
-      window.removeEventListener("pointerdown", markInteraction);
       window.removeEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
       if (timer) window.clearTimeout(timer);
     };
   }, []);
 
-  const close = (cooldown = true) => {
-    if (cooldown) defer();
+  const close = () => {
+    markNotificationHandled();
     setVisible(false);
   };
 
@@ -66,7 +76,7 @@ export function NotificationInvite() {
     try {
       const permission = await Notification.requestPermission();
       if (permission !== "granted") {
-        defer();
+        markNotificationHandled();
         setVisible(false);
         return;
       }
@@ -84,7 +94,7 @@ export function NotificationInvite() {
         body: JSON.stringify(subscription.toJSON()),
       });
       if (!response.ok) throw new Error("Subscription could not be saved");
-      defer();
+      markNotificationHandled();
       setVisible(false);
       toast.success("🕉️ You're now connected");
     } catch {
@@ -107,7 +117,7 @@ export function NotificationInvite() {
         >
           <button
             type="button"
-            onClick={() => close()}
+            onClick={close}
             aria-label="Dismiss notification invitation"
             className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-secondary hover:text-ink"
           >
@@ -138,7 +148,7 @@ export function NotificationInvite() {
             </button>
             <button
               type="button"
-              onClick={() => close()}
+              onClick={close}
               disabled={working}
               className="interactive-surface min-h-10 rounded-xl border border-border bg-cream px-4 text-sm font-semibold text-ink hover:bg-secondary disabled:opacity-60"
             >
