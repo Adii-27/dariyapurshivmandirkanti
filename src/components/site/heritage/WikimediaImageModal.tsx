@@ -30,14 +30,23 @@ export function WikimediaImageModal({
   useEffect(() => {
     if (!file) return;
 
-    // Lock body scroll
+    // Reset technical accordion on new file
+    setShowTechnical(false);
+
+    // Lock body scroll with scrollbar compensation to prevent horizontal page jump
     const previousOverflow = document.body.style.overflow;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    const previousPaddingRight = document.body.style.paddingRight;
+
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
     document.body.style.overflow = "hidden";
 
-    // Focus close button
+    // Focus close button smoothly
     const timer = setTimeout(() => {
       closeBtnRef.current?.focus();
-    }, 50);
+    }, 40);
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -51,13 +60,12 @@ export function WikimediaImageModal({
     return () => {
       clearTimeout(timer);
       document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPaddingRight;
       window.removeEventListener("keydown", onKeyDown);
     };
   }, [file, onClose]);
 
-  if (!file) return null;
-
-  const tech = file.technicalMetadata;
+  const tech = file?.technicalMetadata;
   const hasTech = Boolean(
     tech &&
       (tech.cameraMake ||
@@ -71,311 +79,335 @@ export function WikimediaImageModal({
 
   return (
     <AnimatePresence>
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 lg:p-6"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-      >
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          onClick={onClose}
-          className="absolute inset-0 bg-ink/80 backdrop-blur-md"
-        />
-
-        {/* Modal Window */}
-        <motion.div
-          ref={modalRef}
-          initial={{ opacity: 0, scale: 0.95, y: 12 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.96, y: 8 }}
-          transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="relative flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-gold/40 bg-card shadow-sacred"
+      {file && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 lg:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
         >
-          {/* Header Bar */}
-          <div className="flex items-center justify-between border-b border-border/80 bg-cream/80 px-5 py-3.5 backdrop-blur sm:px-6">
-            <div className="flex items-center gap-2.5">
-              <img
-                src="/wikimedia-commons-logo.svg"
-                alt=""
-                className="h-5 w-5 object-contain"
-                aria-hidden="true"
-              />
-              <span className="text-xs font-semibold uppercase tracking-wider text-saffron-deep">
-                Wikimedia Commons Media
-              </span>
+          {/* Backdrop (solid translucent on mobile, light blur on desktop) */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+            className="absolute inset-0 bg-ink/80 sm:backdrop-blur-sm"
+          />
+
+          {/* Modal Window (lightweight GPU-accelerated transition) */}
+          <motion.div
+            ref={modalRef}
+            initial={{ opacity: 0, scale: 0.98, y: 6 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 4 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="relative flex max-h-[92dvh] w-full max-w-5xl flex-col overflow-hidden rounded-3xl border border-gold/40 bg-card shadow-sacred transform-gpu"
+          >
+            {/* Header Bar */}
+            <div className="flex items-center justify-between border-b border-border/80 bg-cream/90 px-4 py-3 sm:px-6 sm:py-3.5">
+              <div className="flex items-center gap-2.5">
+                <img
+                  src="/wikimedia-commons-logo.svg"
+                  alt=""
+                  className="h-5 w-5 object-contain"
+                  aria-hidden="true"
+                />
+                <span className="text-xs font-semibold uppercase tracking-wider text-saffron-deep">
+                  Wikimedia Commons Media
+                </span>
+              </div>
+
+              <button
+                ref={closeBtnRef}
+                type="button"
+                onClick={onClose}
+                aria-label="Close image details"
+                className="interactive-surface grid h-10 w-10 sm:h-11 sm:w-11 place-items-center rounded-full bg-secondary/60 text-ink/80 hover:bg-secondary hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <X className="h-5 w-5" />
+              </button>
             </div>
 
-            <button
-              ref={closeBtnRef}
-              type="button"
-              onClick={onClose}
-              aria-label="Close image details"
-              className="interactive-surface grid h-11 w-11 place-items-center rounded-full bg-secondary/60 text-ink/80 hover:bg-secondary hover:text-ink focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+            {/* Scrollable Body */}
+            <div className="modal-scroll flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7">
+              <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+                {/* Left Column: Image Preview & Direct Actions */}
+                <div className="space-y-4">
+                  <div
+                    className="relative flex max-h-[56vh] min-h-[220px] sm:min-h-[260px] items-center justify-center overflow-hidden rounded-2xl bg-ink/95 shadow-inner"
+                    style={{
+                      aspectRatio:
+                        file.width && file.height ? `${file.width} / ${file.height}` : undefined,
+                    }}
+                  >
+                    <img
+                      src={file.thumbnailUrl}
+                      alt={file.caption || file.title}
+                      loading="eager"
+                      decoding="async"
+                      width={file.width || 800}
+                      height={file.height || 600}
+                      className="max-h-[54vh] w-auto max-w-full object-contain"
+                    />
+                    <div className="absolute bottom-3 right-3">
+                      <a
+                        href={file.pageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="interactive-surface inline-flex items-center gap-1.5 rounded-lg bg-ink/80 px-2.5 py-1.5 text-xs font-medium text-cream shadow-sm backdrop-blur-sm hover:bg-ink"
+                      >
+                        <Maximize2 className="h-3.5 w-3.5" />
+                        Original on Commons
+                      </a>
+                    </div>
+                  </div>
 
-          {/* Scrollable Body */}
-          <div className="modal-scroll flex-1 overflow-y-auto p-4 sm:p-6 lg:p-7">
-            <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
-              {/* Left Column: Image Preview & Direct Actions */}
-              <div className="space-y-4">
-                <div className="relative flex aspect-auto max-h-[60vh] min-h-[260px] items-center justify-center overflow-hidden rounded-2xl bg-ink/95 shadow-inner">
-                  <img
-                    src={file.thumbnailUrl}
-                    alt={file.caption || file.title}
-                    loading="eager"
-                    decoding="async"
-                    className="max-h-[58vh] w-auto max-w-full object-contain"
-                  />
-                  <div className="absolute bottom-3 right-3">
+                  {/* Primary Action Buttons */}
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                     <a
                       href={file.pageUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="interactive-surface inline-flex items-center gap-1.5 rounded-lg bg-ink/75 px-3 py-1.5 text-xs font-medium text-cream shadow-sm backdrop-blur hover:bg-ink"
+                      className="interactive-surface inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl gradient-saffron px-4 py-2.5 text-center text-xs font-semibold text-primary-foreground shadow-sacred hover:shadow-glow"
                     >
-                      <Maximize2 className="h-3.5 w-3.5" />
-                      Original on Commons
+                      View on Wikimedia Commons
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                    </a>
+
+                    <a
+                      href={file.mediaViewerUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="interactive-surface inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-2.5 text-center text-xs font-semibold text-ink hover:border-gold hover:bg-secondary"
+                    >
+                      Open Media Viewer
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
+                    </a>
+
+                    <a
+                      href={file.pageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="interactive-surface inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-2.5 text-center text-xs font-semibold text-ink hover:border-gold hover:bg-secondary"
+                    >
+                      View Original on Wikimedia Commons
+                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                     </a>
                   </div>
                 </div>
 
-                {/* Primary Action Buttons */}
-                <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
-                  <a
-                    href={file.pageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="interactive-surface inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl gradient-saffron px-4 py-2.5 text-center text-xs font-semibold text-primary-foreground shadow-sacred hover:shadow-glow"
-                  >
-                    View on Wikimedia Commons
-                    <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                  </a>
-
-                  <a
-                    href={file.mediaViewerUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="interactive-surface inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-2.5 text-center text-xs font-semibold text-ink hover:border-gold hover:bg-secondary"
-                  >
-                    Open Media Viewer
-                    <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                  </a>
-
-                  <a
-                    href={file.pageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="interactive-surface inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-2.5 text-center text-xs font-semibold text-ink hover:border-gold hover:bg-secondary"
-                  >
-                    View Original on Wikimedia Commons
-                    <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Right Column: Structured Metadata */}
-              <div className="space-y-5">
-                {/* Title & Description */}
-                <div>
-                  <h3
-                    id="modal-title"
-                    className="font-display text-2xl font-bold leading-tight text-ink sm:text-3xl"
-                  >
-                    {file.title}
-                  </h3>
-                  {file.description && file.description !== file.title && (
-                    <p className="mt-2.5 text-sm leading-relaxed text-ink/80">
+                {/* Right Column: Structured Metadata */}
+                <div className="space-y-5">
+                  <div>
+                    <h3
+                      id="modal-title"
+                      className="font-display text-xl font-bold leading-snug text-ink sm:text-2xl"
+                    >
+                      {file.title}
+                    </h3>
+                    <p className="mt-2 text-xs sm:text-sm leading-relaxed text-muted-foreground">
                       {file.description}
                     </p>
-                  )}
-                </div>
+                  </div>
 
-                {/* Metadata Grid */}
-                <div className="grid gap-3 rounded-2xl border border-border/70 bg-secondary/40 p-4 text-xs">
-                  {file.date && (
-                    <div className="flex items-start gap-3">
-                      <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
-                      <div>
-                        <span className="font-semibold text-ink">Date: </span>
-                        <span className="text-muted-foreground">{file.date}</span>
+                  {/* Fact Badges List */}
+                  <div className="grid gap-2.5 sm:grid-cols-2">
+                    {file.date && (
+                      <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-secondary/40 p-3">
+                        <Calendar className="h-4 w-4 shrink-0 text-saffron-deep" />
+                        <div className="min-w-0 flex-1">
+                          <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                            Captured / Date
+                          </div>
+                          <div className="truncate text-xs font-semibold text-ink">
+                            {file.date}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-secondary/40 p-3">
+                      <User className="h-4 w-4 shrink-0 text-saffron-deep" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Contributor
+                        </div>
+                        <div className="truncate text-xs font-semibold text-ink">
+                          {file.author}
+                        </div>
                       </div>
                     </div>
-                  )}
 
-                  <div className="flex items-start gap-3">
-                    <User className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
-                    <div>
-                      <span className="font-semibold text-ink">Author: </span>
-                      <span className="text-muted-foreground">{file.author}</span>
+                    <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-secondary/40 p-3">
+                      <MapPin className="h-4 w-4 shrink-0 text-saffron-deep" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Location
+                        </div>
+                        <div className="truncate text-xs font-semibold text-ink">
+                          Dariyapur, Kanti
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 rounded-xl border border-border/80 bg-secondary/40 p-3">
+                      <Layers className="h-4 w-4 shrink-0 text-saffron-deep" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          Dimensions &amp; Size
+                        </div>
+                        <div className="truncate text-xs font-semibold text-ink">
+                          {file.width && file.height
+                            ? `${file.width} × ${file.height} px`
+                            : "Original"}
+                          {file.fileSizeFormatted ? ` • ${file.fileSizeFormatted}` : ""}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-3">
-                    <FileText className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
-                    <div>
-                      <span className="font-semibold text-ink">Source: </span>
-                      <span className="text-muted-foreground">{file.source}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
-                    <div>
-                      <span className="font-semibold text-ink">Location: </span>
-                      <span className="text-muted-foreground">{file.location}</span>
-                    </div>
-                  </div>
-
+                  {/* GPS Coordinates (if available) */}
                   {file.coordinates && (
-                    <div className="flex items-start gap-3">
-                      <Info className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
-                      <div>
-                        <span className="font-semibold text-ink">Camera Coordinates: </span>
-                        <span className="text-muted-foreground font-mono text-[11px]">
-                          {file.coordinates.formatted}
-                        </span>{" "}
-                        <a
-                          href={file.coordinates.mapUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="ml-1 font-semibold text-saffron-deep underline underline-offset-2 hover:text-ember"
-                        >
-                          View Map ↗
-                        </a>
+                    <div className="flex items-center justify-between rounded-xl border border-gold/40 bg-gold-soft/20 p-3 text-xs">
+                      <div className="flex items-center gap-2 text-ink">
+                        <MapPin className="h-4 w-4 shrink-0 text-saffron-deep" />
+                        <div>
+                          <span className="font-semibold">GPS: </span>
+                          <span className="font-mono text-[11px]">
+                            {file.coordinates.formatted}
+                          </span>
+                        </div>
                       </div>
+                      <a
+                        href={file.coordinates.mapUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-semibold text-saffron-deep underline-offset-4 hover:underline"
+                      >
+                        Map ↗
+                      </a>
                     </div>
                   )}
 
-                  <div className="flex items-start gap-3">
-                    <Layers className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
-                    <div>
-                      <span className="font-semibold text-ink">File Specs: </span>
-                      <span className="text-muted-foreground">
-                        {file.width.toLocaleString()} × {file.height.toLocaleString()} px ·{" "}
-                        {file.fileSizeFormatted} · {file.mimeType}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* License Information */}
-                <div className="rounded-2xl border border-gold/40 bg-gold-soft/30 p-4">
-                  <div className="flex items-start gap-3">
-                    <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-saffron-deep" />
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-bold uppercase tracking-wider text-saffron-deep">
-                        Licensing
-                      </div>
-                      <p className="mt-1 text-xs font-semibold text-ink">
-                        {file.licenseName} ({file.license})
-                      </p>
-                      <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                        This file is licensed under the Creative Commons license above as published on Wikimedia Commons.
-                      </p>
-                      {file.licenseUrl && (
-                        <div className="mt-2">
+                  {/* Licensing Panel */}
+                  <div className="rounded-2xl border border-gold/40 bg-card p-4 shadow-sm">
+                    <div className="flex items-start gap-2.5">
+                      <ShieldCheck className="h-5 w-5 shrink-0 text-saffron-deep" />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-saffron-deep">
+                          Wikimedia Licensing &amp; Attribution
+                        </div>
+                        <div className="mt-1 text-xs font-semibold text-ink">
+                          {file.licenseName} ({file.license})
+                        </div>
+                        <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                          This media is shared under the Creative Commons Attribution-ShareAlike 4.0
+                          International license on Wikimedia Commons.
+                        </p>
+                        {file.licenseUrl && (
                           <a
                             href={file.licenseUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-saffron-deep hover:underline"
+                            className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-saffron-deep underline-offset-4 hover:underline"
                           >
-                            View License Terms
+                            Read License Terms
                             <ExternalLink className="h-3 w-3" />
                           </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Collapsible Technical EXIF Metadata */}
+                  {hasTech && tech && (
+                    <div className="rounded-2xl border border-border bg-secondary/30">
+                      <button
+                        type="button"
+                        onClick={() => setShowTechnical(!showTechnical)}
+                        className="interactive-surface flex w-full items-center justify-between p-3.5 text-left text-xs font-semibold text-ink hover:bg-secondary/60 rounded-2xl"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Camera className="h-4 w-4 text-saffron-deep" />
+                          <span>Technical Camera &amp; EXIF Metadata</span>
+                        </div>
+                        <ChevronDown
+                          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+                            showTechnical ? "rotate-180" : ""
+                          }`}
+                        />
+                      </button>
+
+                      {showTechnical && (
+                        <div className="border-t border-border/60 p-3.5">
+                          <dl className="grid grid-cols-2 gap-2 text-xs">
+                            {tech.cameraMake && (
+                              <div>
+                                <dt className="text-[10px] uppercase text-muted-foreground">
+                                  Camera Make
+                                </dt>
+                                <dd className="font-semibold text-ink">{tech.cameraMake}</dd>
+                              </div>
+                            )}
+                            {tech.cameraModel && (
+                              <div>
+                                <dt className="text-[10px] uppercase text-muted-foreground">
+                                  Model
+                                </dt>
+                                <dd className="font-semibold text-ink">{tech.cameraModel}</dd>
+                              </div>
+                            )}
+                            {tech.aperture && (
+                              <div>
+                                <dt className="text-[10px] uppercase text-muted-foreground">
+                                  Aperture
+                                </dt>
+                                <dd className="font-semibold text-ink">{tech.aperture}</dd>
+                              </div>
+                            )}
+                            {tech.exposureTime && (
+                              <div>
+                                <dt className="text-[10px] uppercase text-muted-foreground">
+                                  Exposure
+                                </dt>
+                                <dd className="font-semibold text-ink">{tech.exposureTime}</dd>
+                              </div>
+                            )}
+                            {tech.iso && (
+                              <div>
+                                <dt className="text-[10px] uppercase text-muted-foreground">ISO</dt>
+                                <dd className="font-semibold text-ink">{tech.iso}</dd>
+                              </div>
+                            )}
+                            {tech.focalLength && (
+                              <div>
+                                <dt className="text-[10px] uppercase text-muted-foreground">
+                                  Focal Length
+                                </dt>
+                                <dd className="font-semibold text-ink">{tech.focalLength}</dd>
+                              </div>
+                            )}
+                            {tech.software && (
+                              <div className="col-span-2">
+                                <dt className="text-[10px] uppercase text-muted-foreground">
+                                  Software / Device OS
+                                </dt>
+                                <dd className="font-semibold text-ink truncate">{tech.software}</dd>
+                              </div>
+                            )}
+                          </dl>
                         </div>
                       )}
                     </div>
-                  </div>
+                  )}
                 </div>
-
-                {/* Technical EXIF Metadata (Collapsible) */}
-                {hasTech && tech && (
-                  <div className="rounded-2xl border border-border/70 bg-card overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setShowTechnical((prev) => !prev)}
-                      aria-expanded={showTechnical}
-                      className="interactive-surface flex min-h-11 w-full items-center justify-between px-4 py-3 text-left text-xs font-semibold text-ink hover:bg-secondary/40"
-                    >
-                      <span className="flex items-center gap-2">
-                        <Camera className="h-4 w-4 text-saffron-deep" />
-                        Technical Metadata (EXIF)
-                      </span>
-                      <ChevronDown
-                        className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
-                          showTechnical ? "rotate-180" : ""
-                        }`}
-                      />
-                    </button>
-
-                    {showTechnical && (
-                      <div className="border-t border-border/60 bg-secondary/20 p-4 text-xs space-y-2">
-                        {tech.cameraMake && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Camera Make:</span>
-                            <span className="font-semibold text-ink">{tech.cameraMake}</span>
-                          </div>
-                        )}
-                        {tech.cameraModel && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Camera Model:</span>
-                            <span className="font-semibold text-ink">{tech.cameraModel}</span>
-                          </div>
-                        )}
-                        {tech.iso && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">ISO Speed:</span>
-                            <span className="font-semibold text-ink">{tech.iso}</span>
-                          </div>
-                        )}
-                        {tech.aperture && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Aperture:</span>
-                            <span className="font-semibold text-ink">{tech.aperture}</span>
-                          </div>
-                        )}
-                        {tech.exposureTime && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Exposure Time:</span>
-                            <span className="font-semibold text-ink">{tech.exposureTime}</span>
-                          </div>
-                        )}
-                        {tech.focalLength && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Focal Length:</span>
-                            <span className="font-semibold text-ink">{tech.focalLength}</span>
-                          </div>
-                        )}
-                        {tech.dateTimeOriginal && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Capture Time:</span>
-                            <span className="font-semibold text-ink">{tech.dateTimeOriginal}</span>
-                          </div>
-                        )}
-                        {tech.software && (
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Software:</span>
-                            <span className="font-semibold text-ink">{tech.software}</span>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        </motion.div>
-      </div>
+          </motion.div>
+        </div>
+      )}
     </AnimatePresence>
   );
 }

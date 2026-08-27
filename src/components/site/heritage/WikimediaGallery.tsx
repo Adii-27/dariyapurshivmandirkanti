@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Camera, ExternalLink, MapPin, Maximize2, ShieldCheck } from "lucide-react";
+import { Camera, MapPin, Maximize2 } from "lucide-react";
 import type { WikimediaFile } from "@/lib/wikimedia/commons";
 import { WikimediaImageModal } from "./WikimediaImageModal";
 
@@ -19,11 +19,10 @@ export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
         {/* Featured Image Card */}
         {featured && (
           <motion.div
-            layout
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="group col-span-1 sm:col-span-2 lg:col-span-2 lg:row-span-2"
           >
             <div
@@ -44,13 +43,15 @@ export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
                 alt={featured.caption || featured.title}
                 loading="lazy"
                 decoding="async"
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                width={featured.width || 800}
+                height={featured.height || 600}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/30 to-transparent" />
 
               {/* Badges */}
               <div className="absolute left-4 top-4 right-4 flex items-center justify-between gap-2 sm:left-6 sm:top-6 sm:right-6">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-ink/75 px-3 py-1 text-[11px] font-semibold tracking-wider text-gold-soft backdrop-blur-md">
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-ink/75 px-3 py-1 text-[11px] font-semibold tracking-wider text-gold-soft backdrop-blur-sm">
                   <Camera className="h-3 w-3 text-gold" />
                   Featured Wikimedia Media
                 </div>
@@ -93,11 +94,10 @@ export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
         {supporting.map((file, idx) => (
           <motion.div
             key={file.id}
-            layout
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.5, delay: (idx % 3) * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.45, delay: (idx % 3) * 0.06, ease: [0.22, 1, 0.36, 1] }}
             className="group"
           >
             <div
@@ -118,13 +118,15 @@ export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
                 alt={file.caption || file.title}
                 loading="lazy"
                 decoding="async"
-                className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                width={file.width || 800}
+                height={file.height || 600}
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-400 ease-out group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/20 to-transparent" />
 
               {/* Badges */}
               <div className="absolute left-3 top-3 right-3 flex items-center justify-between gap-1.5">
-                <span className="inline-flex items-center gap-1 rounded-full bg-ink/70 px-2 py-0.5 text-[10px] font-medium text-gold-soft backdrop-blur">
+                <span className="inline-flex items-center gap-1 rounded-full bg-ink/70 px-2 py-0.5 text-[10px] font-medium text-gold-soft backdrop-blur-sm">
                   Wikimedia
                 </span>
                 <span className="inline-flex items-center rounded-full bg-cream/90 px-2 py-0.5 text-[10px] font-bold text-ink shadow-sm">

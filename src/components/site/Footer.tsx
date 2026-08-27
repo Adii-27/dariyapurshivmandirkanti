@@ -247,7 +247,7 @@ export function Footer() {
                 <img
                   src={TEMPLE_LOGO}
                   alt="Dariyapur Shiv Mandir Kanti logo"
-                  className="h-14 w-14 rounded-full ring-1 ring-gold/50 shadow-glow"
+                  className="h-14 w-14 rounded-full ring-1 ring-gold/30 object-cover"
                 />
                 <div>
                   <div className="font-display text-xl font-semibold text-cream">
@@ -512,11 +512,23 @@ function NotificationPreferenceCard() {
       <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-[#241a12]/90 p-4 shadow-sm backdrop-blur-md">
         {/* Card Header: Bell Icon & Text */}
         <div className="flex items-start gap-3">
-          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-amber-500/25 to-amber-700/35 text-gold ring-1 ring-gold/40 shadow-sm">
-            {permission === "denied" ? (
-              <BellOff className="h-5 w-5 text-rose-400" />
+          <div
+            className={`grid h-10 w-10 shrink-0 place-items-center rounded-full shadow-sm transition-all duration-200 ${
+              subscribed
+                ? "bg-gradient-to-br from-amber-500/25 to-amber-700/35 text-gold ring-1 ring-gold/40"
+                : permission === "denied"
+                  ? "bg-rose-950/40 text-rose-400 ring-1 ring-rose-500/40"
+                  : "bg-cream/10 text-cream/60 ring-1 ring-cream/20"
+            }`}
+          >
+            {subscribed ? (
+              <Bell className="h-5 w-5 text-gold transition-transform duration-200" />
             ) : (
-              <Bell className="h-5 w-5 text-gold" />
+              <BellOff
+                className={`h-5 w-5 transition-transform duration-200 ${
+                  permission === "denied" ? "text-rose-400" : "text-cream/60"
+                }`}
+              />
             )}
           </div>
 
