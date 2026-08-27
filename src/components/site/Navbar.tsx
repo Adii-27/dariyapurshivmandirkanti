@@ -12,6 +12,7 @@ import { INSTALL_AVAILABLE_EVENT, REQUEST_INSTALL_EVENT } from "@/lib/push";
 const links = [
   { href: "/#home", label: "Home" },
   { href: "/#about", label: "About" },
+  { href: "/heritage", label: "Heritage" },
   { href: "/#gallery", label: "Gallery" },
   { href: "/sangeet", label: "Sangeet" },
   { href: "/#seva", label: "Seva" },

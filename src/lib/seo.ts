@@ -69,6 +69,13 @@ export const SEO_PAGES = {
     path: "/contact",
     breadcrumbLabel: "Contact Us",
   },
+  heritage: {
+    title: "Heritage | Dariyapur Shiv Mandir Kanti",
+    description:
+      "Explore the heritage of Dariyapur Shiv Mandir Kanti and view authentic temple photographs documented through Wikimedia Commons.",
+    path: "/heritage",
+    breadcrumbLabel: "Heritage",
+  },
   faq: {
     title: "Frequently Asked Questions | Dariyapur Shiv Mandir Kanti",
     description:

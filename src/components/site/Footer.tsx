@@ -1,6 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  Bell,
+  BellOff,
+  Check,
+  ExternalLink,
+  Info,
+  Loader2,
+  MapPin,
+  Shield,
+  Sparkles,
+} from "lucide-react";
+import { toast } from "sonner";
 import { TEMPLE_LOGO } from "@/lib/media";
+import {
+  base64UrlToUint8Array,
+  canUseWebPush,
+} from "@/lib/push";
 
 const VISITOR_COUNTER_URL = "/api/visitors";
 const VISITOR_SESSION_KEY = "dsmk-visitor-counted";
@@ -161,6 +177,7 @@ const InstagramIcon = (p: React.SVGProps<SVGSVGElement>) => (
     <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
   </svg>
 );
+
 const FacebookIcon = (p: React.SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 24 24"
@@ -174,15 +191,36 @@ const FacebookIcon = (p: React.SVGProps<SVGSVGElement>) => (
     <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
   </svg>
 );
+
 const YouTubeIcon = (p: React.SVGProps<SVGSVGElement>) => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...p}>
     <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z" />
   </svg>
 );
 
+const LotusIcon = (p: React.SVGProps<SVGSVGElement>) => (
+  <svg
+    viewBox="0 0 64 48"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...p}
+  >
+    <path d="M32 6 C28 16 26 28 32 40 C38 28 36 16 32 6 Z" />
+    <path d="M32 18 C22 22 14 30 18 40 C24 38 29 34 32 28" />
+    <path d="M32 18 C42 22 50 30 46 40 C40 38 35 34 32 28" />
+    <path d="M22 26 C12 28 4 34 8 42 C16 42 24 38 28 34" />
+    <path d="M42 26 C52 28 60 34 56 42 C48 42 40 38 36 34" />
+    <path d="M12 42 C24 46 40 46 52 42" />
+  </svg>
+);
+
 const quickLinks = [
   ["/#home", "Home"],
   ["/#about", "About"],
+  ["/heritage", "Heritage"],
   ["/#gallery", "Gallery"],
   ["/#seva", "Seva"],
   ["/#visit", "Visitor Information"],
@@ -194,47 +232,58 @@ const quickLinks = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-12 overflow-hidden bg-ink text-cream/85">
-      <div className="absolute inset-x-0 top-0 h-1 gradient-saffron" />
-      <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-saffron/10 blur-3xl" />
-      <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-gold/10 blur-3xl" />
+    <footer className="relative mt-16 overflow-hidden bg-[#160f0a] text-cream/85">
+      {/* Subtle top sacred border & ambient glow */}
+      <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+      <div className="absolute -right-32 -top-32 h-96 w-96 rounded-full bg-saffron/10 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-32 -left-32 h-96 w-96 rounded-full bg-gold/10 blur-3xl pointer-events-none" />
 
-      <div className="relative mx-auto max-w-7xl px-5 py-16 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
-          <div>
-            <div className="flex items-center gap-3">
-              <img
-                src={TEMPLE_LOGO}
-                alt=""
-                className="h-14 w-14 rounded-full ring-1 ring-gold/40"
-              />
-              <div>
-                <div className="font-display text-xl font-semibold text-cream">
-                  Dariyapur Shiv Mandir
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_0.9fr_1fr_1.1fr] lg:gap-12">
+          {/* COLUMN 1: Temple Identity & Notification Card */}
+          <div className="flex flex-col justify-between space-y-6">
+            <div>
+              <div className="flex items-center gap-3">
+                <img
+                  src={TEMPLE_LOGO}
+                  alt="Dariyapur Shiv Mandir Kanti logo"
+                  className="h-14 w-14 rounded-full ring-1 ring-gold/50 shadow-glow"
+                />
+                <div>
+                  <div className="font-display text-xl font-semibold text-cream">
+                    Dariyapur Shiv Mandir
+                  </div>
+                  <div className="font-hindi text-sm text-gold-soft">दरियापुर शिव मंदिर काँटी</div>
                 </div>
-                <div className="font-hindi text-sm text-gold-soft">दरियापुर शिव मंदिर काँटी</div>
               </div>
+
+              <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-gold-soft">
+                ESTABLISHED • 1962
+              </p>
+
+              <p className="mt-4 max-w-sm text-sm leading-relaxed text-cream/75">
+                A sacred centre of Lord Shiva devotion in Kanti, serving devotees with faith,
+                compassion and community for over six decades.
+              </p>
+
+              <p className="font-hindi mt-4 text-base font-semibold text-gold-soft">ॐ नमः शिवाय</p>
             </div>
-            <p className="mt-3 text-xs font-semibold uppercase tracking-wider text-cream/65">
-              Established • 1962
-            </p>
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-cream/65">
-              A sacred centre of Lord Shiva devotion in Kanti, serving devotees with faith,
-              compassion and community for over six decades.
-            </p>
-            <p className="font-hindi mt-5 text-base text-gold-soft">ॐ नमः शिवाय</p>
+
+            {/* TEMPLE NOTIFICATIONS PREFERENCE CARD */}
+            <NotificationPreferenceCard />
           </div>
 
+          {/* COLUMN 2: Quick Links */}
           <div>
-            <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-gold">
-              Quick Links
+            <h4 className="font-display text-xs font-bold uppercase tracking-[0.22em] text-gold">
+              QUICK LINKS
             </h4>
-            <ul className="mt-4 space-y-2.5 text-sm">
+            <ul className="mt-5 space-y-2.5 text-sm">
               {quickLinks.map(([h, l]) => (
                 <li key={h}>
                   <a
                     href={h}
-                    className="inline-flex min-h-11 items-center rounded-md text-cream/70 transition-colors duration-300 hover:text-gold-soft"
+                    className="inline-flex min-h-9 items-center rounded-md text-cream/70 transition-colors duration-200 hover:text-gold-soft"
                   >
                     {l}
                   </a>
@@ -243,30 +292,49 @@ export function Footer() {
             </ul>
           </div>
 
+          {/* COLUMN 3: Visit Information */}
           <div>
-            <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-gold">
-              Visit
+            <h4 className="font-display text-xs font-bold uppercase tracking-[0.22em] text-gold">
+              VISIT
             </h4>
-            <ul className="mt-4 text-sm">
-              <li className="font-semibold text-cream/85">Open Daily</li>
-              <li className="mt-1 text-base font-semibold text-gold-soft">7:00 AM – 8:00 PM</li>
-              <li className="mt-4">
-                <address className="max-w-48 not-italic leading-relaxed text-cream/55">
-                  <span className="block">Dariyapur Shiv Mandir Kanti</span>
+            <div className="mt-5 space-y-4 text-sm">
+              <div>
+                <div className="font-semibold text-cream">Open Daily</div>
+                <div className="mt-1 text-base font-semibold text-gold-soft">7:00 AM – 8:00 PM</div>
+              </div>
+
+              <div>
+                <address className="max-w-56 not-italic leading-relaxed text-cream/65">
+                  <span className="block font-medium text-cream/80">Dariyapur Shiv Mandir Kanti</span>
                   <span className="block">Near Paswan Chowk</span>
                   <span className="block">Dariyapur, Kanti</span>
                   <span className="block">Muzaffarpur, Bihar</span>
                   <span className="block">India</span>
                 </address>
-              </li>
-            </ul>
+              </div>
+
+              <div className="pt-2">
+                <a
+                  href="https://maps.app.goo.gl/AwKW2occqHKrJVA9A"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="interactive-surface inline-flex min-h-10 items-center gap-1.5 rounded-full border border-gold/40 bg-gold-soft/10 px-4 py-2 text-xs font-semibold text-gold-soft shadow-sm hover:border-gold hover:bg-gold-soft/20"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  View on Google Maps →
+                </a>
+              </div>
+            </div>
           </div>
 
-          <div>
-            <h4 className="font-display text-sm font-semibold uppercase tracking-widest text-gold">
-              Connect
+          {/* COLUMN 4: Connect, Social, Visitor Counter & Benediction */}
+          <div className="space-y-5">
+            <h4 className="font-display text-xs font-bold uppercase tracking-[0.22em] text-gold">
+              CONNECT
             </h4>
-            <div className="mt-4 flex gap-3">
+
+            {/* Social Icons */}
+            <div className="flex gap-3">
               <motion.a
                 href="https://www.instagram.com/dariyapurshivmandirkanti"
                 target="_blank"
@@ -274,7 +342,7 @@ export function Footer() {
                 aria-label="Instagram"
                 whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.92 }}
-                className="grid h-11 w-11 place-items-center rounded-lg bg-cream/10 text-cream transition-shadow duration-300 hover:gradient-saffron hover:shadow-glow"
+                className="grid h-10 w-10 place-items-center rounded-xl border border-cream/15 bg-cream/10 text-cream transition-all duration-300 hover:gradient-saffron hover:shadow-glow"
               >
                 <InstagramIcon className="h-4 w-4" />
               </motion.a>
@@ -285,7 +353,7 @@ export function Footer() {
                 aria-label="Facebook"
                 whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.92 }}
-                className="grid h-11 w-11 place-items-center rounded-lg bg-cream/10 text-cream transition-shadow duration-300 hover:gradient-saffron hover:shadow-glow"
+                className="grid h-10 w-10 place-items-center rounded-xl border border-cream/15 bg-cream/10 text-cream transition-all duration-300 hover:gradient-saffron hover:shadow-glow"
               >
                 <FacebookIcon className="h-4 w-4" />
               </motion.a>
@@ -296,34 +364,45 @@ export function Footer() {
                 aria-label="YouTube"
                 whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.92 }}
-                className="grid h-11 w-11 place-items-center rounded-lg bg-cream/10 text-cream transition-shadow duration-300 hover:gradient-saffron hover:shadow-glow"
+                className="grid h-10 w-10 place-items-center rounded-xl border border-cream/15 bg-cream/10 text-cream transition-all duration-300 hover:gradient-saffron hover:shadow-glow"
               >
                 <YouTubeIcon className="h-4 w-4" />
               </motion.a>
             </div>
-            <motion.a
-              href="https://youtube.com/@dariyapurshivmandirkanti"
-              target="_blank"
-              rel="noreferrer"
-              whileHover={{ x: 2 }}
-              whileTap={{ scale: 0.98 }}
-              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-md text-sm font-semibold text-gold-soft underline-offset-4 hover:underline"
-            >
-              <span aria-hidden="true">▶</span>
-              Visit Our YouTube Channel
-            </motion.a>
+
+            {/* YouTube CTA */}
+            <div>
+              <a
+                href="https://youtube.com/@dariyapurshivmandirkanti"
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex min-h-9 items-center gap-2 text-xs font-semibold text-gold-soft underline-offset-4 hover:underline"
+              >
+                <span className="text-[10px]" aria-hidden="true">▶</span>
+                Visit Our YouTube Channel
+              </a>
+            </div>
+
+            {/* Live Visitor Counter */}
             <VisitorCounter />
-            <a
-              href="https://maps.app.goo.gl/AwKW2occqHKrJVA9A"
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 inline-flex min-h-11 items-center rounded-md text-sm text-gold-soft underline-offset-4 hover:underline"
-            >
-              View on Google Maps →
-            </a>
+
+            {/* Devotional Lotus & Benediction Note */}
+            <div className="pt-2 text-center">
+              <div className="flex justify-center text-gold/70">
+                <LotusIcon className="h-9 w-12" />
+              </div>
+              <p className="mt-2 text-xs leading-relaxed text-cream/70">
+                Thank you for visiting our official website. May Lord Shiva bless you and your family
+                with peace, health and prosperity.
+              </p>
+              <p className="font-hindi mt-1.5 text-sm font-semibold text-gold-soft">
+                ॐ नमः शिवाय
+              </p>
+            </div>
           </div>
         </div>
 
+        {/* BOTTOM COPYRIGHT ROW */}
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-cream/10 pt-6 text-center text-xs text-cream/55 sm:flex-row sm:text-left">
           <p>
             © Dariyapur Shiv Mandir Kanti. All Rights Reserved.{" "}
@@ -333,6 +412,194 @@ export function Footer() {
         </div>
       </div>
     </footer>
+  );
+}
+
+/**
+ * TEMPLE NOTIFICATIONS PREFERENCE CARD
+ * Fully synchronized with browser push status and PushSubscription
+ */
+function NotificationPreferenceCard() {
+  const [supported, setSupported] = useState(true);
+  const [permission, setPermission] = useState<NotificationPermission>("default");
+  const [subscribed, setSubscribed] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!canUseWebPush()) {
+      setSupported(false);
+      return;
+    }
+
+    setPermission(Notification.permission);
+
+    // Check existing push subscription
+    let isMounted = true;
+    navigator.serviceWorker.ready
+      .then((reg) => reg.pushManager.getSubscription())
+      .then((sub) => {
+        if (isMounted) {
+          setSubscribed(Boolean(sub) && Notification.permission === "granted");
+        }
+      })
+      .catch(() => {
+        if (isMounted) setSubscribed(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const toggleSubscription = async () => {
+    if (!supported || loading) return;
+
+    setLoading(true);
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const existingSub = await reg.pushManager.getSubscription();
+
+      if (subscribed && existingSub) {
+        // Unsubscribe flow
+        await fetch("/api/push/subscribe", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ endpoint: existingSub.endpoint }),
+        }).catch(() => null);
+
+        await existingSub.unsubscribe().catch(() => null);
+        setSubscribed(false);
+        toast.info("Notifications turned off");
+      } else {
+        // Subscribe flow
+        const perm = await Notification.requestPermission();
+        setPermission(perm);
+
+        if (perm === "granted") {
+          let newSub = existingSub;
+          if (!newSub) {
+            newSub = await reg.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: base64UrlToUint8Array(
+                import.meta.env.VITE_WEB_PUSH_PUBLIC_KEY,
+              ),
+            });
+          }
+
+          const res = await fetch("/api/push/subscribe", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newSub.toJSON()),
+          });
+
+          if (!res.ok) throw new Error("Failed to register subscription");
+
+          setSubscribed(true);
+          toast.success("🕉️ Subscribed to Temple Notifications");
+        } else if (perm === "denied") {
+          toast.error("Notifications are blocked in your browser settings.");
+        }
+      }
+    } catch {
+      toast.error("Could not update notification settings. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="w-full max-w-sm space-y-2">
+      <div className="relative overflow-hidden rounded-2xl border border-gold/30 bg-[#241a12]/90 p-4 shadow-sm backdrop-blur-md">
+        {/* Card Header: Bell Icon & Text */}
+        <div className="flex items-start gap-3">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-gradient-to-br from-amber-500/25 to-amber-700/35 text-gold ring-1 ring-gold/40 shadow-sm">
+            {permission === "denied" ? (
+              <BellOff className="h-5 w-5 text-rose-400" />
+            ) : (
+              <Bell className="h-5 w-5 text-gold" />
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <h5 className="font-display text-xs font-bold uppercase tracking-wider text-gold">
+              TEMPLE NOTIFICATIONS
+            </h5>
+            <p className="mt-1 text-[11px] leading-relaxed text-cream/75">
+              Stay updated with important temple notices, festival reminders and special
+              announcements.
+            </p>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="my-3.5 h-px bg-cream/10" />
+
+        {/* Preference Control Row */}
+        {!supported ? (
+          <div className="text-[11px] text-cream/50">
+            Notifications unavailable on this device/browser.
+          </div>
+        ) : permission === "denied" ? (
+          <div className="space-y-1.5 text-[11px] text-rose-300">
+            <div className="flex items-center gap-1.5 font-semibold">
+              <Info className="h-3.5 w-3.5 shrink-0" />
+              Notifications Blocked
+            </div>
+            <p className="text-[10.5px] text-cream/60">
+              Please enable notifications in your browser's site settings to receive temple alerts.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium text-cream">Notifications</span>
+
+              {/* Accessible Toggle Button */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={subscribed}
+                aria-label="Toggle Temple Notifications"
+                disabled={loading}
+                onClick={toggleSubscription}
+                className={`interactive-surface relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-gold disabled:opacity-60 ${
+                  subscribed
+                    ? "gradient-saffron justify-end shadow-sacred"
+                    : "bg-cream/20 justify-start"
+                }`}
+              >
+                {/* Knob */}
+                <span
+                  className={`flex h-6 w-6 items-center justify-center rounded-full bg-cream text-[10px] font-bold text-ink shadow-md transition-transform duration-200 ${
+                    subscribed ? "translate-x-0 text-saffron-deep" : "translate-x-0 text-ink/60"
+                  }`}
+                >
+                  {loading ? (
+                    <Loader2 className="h-3 w-3 animate-spin text-saffron-deep" />
+                  ) : (
+                    subscribed ? "ON" : "OFF"
+                  )}
+                </span>
+              </button>
+            </div>
+
+            {/* Subscribed Status confirmation */}
+            {subscribed && (
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-gold-soft">
+                <Check className="h-3.5 w-3.5 text-gold" />
+                <span>You are subscribed to notifications</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Privacy note below card */}
+      <div className="flex items-center gap-1.5 px-1 text-[10.5px] text-cream/50">
+        <Shield className="h-3.5 w-3.5 shrink-0 text-gold/60" />
+        <span>Your privacy is our priority. We never share your information with anyone.</span>
+      </div>
+    </div>
   );
 }
 
@@ -408,13 +675,13 @@ function VisitorCounter() {
   return (
     <div
       ref={containerRef}
-      className="mt-4 border-y border-cream/10 py-3 text-sm text-cream/70"
+      className="border-y border-cream/10 py-3 text-sm text-cream/75"
       role="status"
       aria-live="polite"
     >
       <div className="flex items-center justify-between gap-3">
-        <span className="font-medium">
-          <span aria-hidden="true">👥</span> Temple Website Visitors
+        <span className="font-medium text-xs text-cream/80">
+          <span aria-hidden="true" className="mr-1">👥</span> Temple Website Visitors
         </span>
         <span className="shrink-0 font-semibold tabular-nums text-gold-soft">
           {count !== null

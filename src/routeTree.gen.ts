@@ -14,6 +14,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SevaRouteImport } from './routes/seva'
 import { Route as SangeetRouteImport } from './routes/sangeet'
 import { Route as LocationRouteImport } from './routes/location'
+import { Route as HeritageRouteImport } from './routes/heritage'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -47,6 +48,11 @@ const SangeetRoute = SangeetRouteImport.update({
 const LocationRoute = LocationRouteImport.update({
   id: '/location',
   path: '/location',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeritageRoute = HeritageRouteImport.update({
+  id: '/heritage',
+  path: '/heritage',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GalleryRoute = GalleryRouteImport.update({
@@ -101,6 +107,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/heritage': typeof HeritageRoute
   '/location': typeof LocationRoute
   '/sangeet': typeof SangeetRoute
   '/seva': typeof SevaRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/heritage': typeof HeritageRoute
   '/location': typeof LocationRoute
   '/sangeet': typeof SangeetRoute
   '/seva': typeof SevaRoute
@@ -134,6 +142,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
   '/gallery': typeof GalleryRoute
+  '/heritage': typeof HeritageRoute
   '/location': typeof LocationRoute
   '/sangeet': typeof SangeetRoute
   '/seva': typeof SevaRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/gallery'
+    | '/heritage'
     | '/location'
     | '/sangeet'
     | '/seva'
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/gallery'
+    | '/heritage'
     | '/location'
     | '/sangeet'
     | '/seva'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/faq'
     | '/gallery'
+    | '/heritage'
     | '/location'
     | '/sangeet'
     | '/seva'
@@ -201,6 +213,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
   GalleryRoute: typeof GalleryRoute
+  HeritageRoute: typeof HeritageRoute
   LocationRoute: typeof LocationRoute
   SangeetRoute: typeof SangeetRoute
   SevaRoute: typeof SevaRoute
@@ -247,6 +260,13 @@ declare module '@tanstack/react-router' {
       path: '/location'
       fullPath: '/location'
       preLoaderRoute: typeof LocationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heritage': {
+      id: '/heritage'
+      path: '/heritage'
+      fullPath: '/heritage'
+      preLoaderRoute: typeof HeritageRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gallery': {
@@ -321,6 +341,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
   GalleryRoute: GalleryRoute,
+  HeritageRoute: HeritageRoute,
   LocationRoute: LocationRoute,
   SangeetRoute: SangeetRoute,
   SevaRoute: SevaRoute,
