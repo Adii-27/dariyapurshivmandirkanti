@@ -175,6 +175,7 @@ function createStructuredData(
         image: imageUrl,
         address,
         geo,
+        hasMap: "https://maps.app.goo.gl/AwKW2occqHKrJVA9A",
         email: siteConfig.email,
         openingHours: "Mo-Su 07:00-20:00",
         sameAs: siteConfig.social,

@@ -319,7 +319,7 @@ export function Footer() {
                 <span className="block">Near Paswan Chowk</span>
                 <span className="block">Dariyapur, Kanti</span>
                 <span className="block">Muzaffarpur, Bihar</span>
-                <span className="block">India - 843435</span>
+                <span className="block">India - 843113</span>
               </address>
             </div>
 
@@ -426,9 +426,6 @@ export function Footer() {
               <p className="mt-2 text-xs leading-relaxed text-cream/70 max-w-[260px] mx-auto">
                 Thank you for visiting our official website. May Lord Shiva bless you and your family
                 with peace, health and prosperity.
-              </p>
-              <p className="font-hindi mt-2 text-base font-semibold text-gold-soft">
-                ॐ नमः शिवाय
               </p>
             </div>
           </div>
