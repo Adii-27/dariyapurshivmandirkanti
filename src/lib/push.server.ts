@@ -144,10 +144,24 @@ export function verifySanityWebhook(rawBody: string, signature: string | null) {
   const expected = values.v1;
   if (!timestamp || !expected || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300)
     return false;
-  const digest = createHmac("sha256", secret).update(`${timestamp}.${rawBody}`).digest("base64url");
-  const left = Buffer.from(digest);
-  const right = Buffer.from(expected);
-  return left.length === right.length && timingSafeEqual(left, right);
+
+  const digestBase64 = createHmac("sha256", secret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest("base64");
+  const digestBase64Url = createHmac("sha256", secret)
+    .update(`${timestamp}.${rawBody}`)
+    .digest("base64url");
+
+  const expectedBuf = Buffer.from(expected);
+  const leftBase64 = Buffer.from(digestBase64);
+  const leftBase64Url = Buffer.from(digestBase64Url);
+
+  const matchesBase64 =
+    leftBase64.length === expectedBuf.length && timingSafeEqual(leftBase64, expectedBuf);
+  const matchesBase64Url =
+    leftBase64Url.length === expectedBuf.length && timingSafeEqual(leftBase64Url, expectedBuf);
+
+  return matchesBase64 || matchesBase64Url;
 }
 
 export async function reserveWebhook(idempotencyKey: string) {
