@@ -16,6 +16,8 @@ import { TEMPLE_LOGO } from "@/lib/media";
 import {
   base64UrlToUint8Array,
   canUseWebPush,
+  dispatchNotificationStateChange,
+  NOTIFICATION_STATE_CHANGED_EVENT,
 } from "@/lib/push";
 
 const VISITOR_COUNTER_URL = "/api/visitors";
@@ -431,23 +433,55 @@ function NotificationPreferenceCard() {
       return;
     }
 
-    setPermission(Notification.permission);
-
-    // Check existing push subscription
     let isMounted = true;
-    navigator.serviceWorker.ready
-      .then((reg) => reg.pushManager.getSubscription())
-      .then((sub) => {
-        if (isMounted) {
-          setSubscribed(Boolean(sub) && Notification.permission === "granted");
-        }
-      })
-      .catch(() => {
-        if (isMounted) setSubscribed(false);
-      });
+
+    const syncSubscriptionState = () => {
+      if (!canUseWebPush()) {
+        if (isMounted) setSupported(false);
+        return;
+      }
+
+      if (typeof Notification !== "undefined") {
+        if (isMounted) setPermission(Notification.permission);
+      }
+
+      if (typeof navigator !== "undefined" && "serviceWorker" in navigator && navigator.serviceWorker) {
+        navigator.serviceWorker.ready
+          .then((reg) => reg.pushManager.getSubscription())
+          .then((sub) => {
+            if (isMounted) {
+              setSubscribed(Boolean(sub) && Notification.permission === "granted");
+            }
+          })
+          .catch(() => {
+            if (isMounted) setSubscribed(false);
+          });
+      }
+    };
+
+    // Initial check on mount
+    syncSubscriptionState();
+
+    // Listen for shared state changes across components
+    const onStateChange = () => {
+      syncSubscriptionState();
+    };
+
+    const onVisibilityOrFocus = () => {
+      if (document.visibilityState === "visible") {
+        syncSubscriptionState();
+      }
+    };
+
+    window.addEventListener(NOTIFICATION_STATE_CHANGED_EVENT, onStateChange);
+    window.addEventListener("focus", onVisibilityOrFocus);
+    document.addEventListener("visibilitychange", onVisibilityOrFocus);
 
     return () => {
       isMounted = false;
+      window.removeEventListener(NOTIFICATION_STATE_CHANGED_EVENT, onStateChange);
+      window.removeEventListener("focus", onVisibilityOrFocus);
+      document.removeEventListener("visibilitychange", onVisibilityOrFocus);
     };
   }, []);
 
@@ -469,6 +503,7 @@ function NotificationPreferenceCard() {
 
         await existingSub.unsubscribe().catch(() => null);
         setSubscribed(false);
+        dispatchNotificationStateChange(false);
         toast.info("Notifications turned off");
       } else {
         // Subscribe flow
@@ -495,6 +530,7 @@ function NotificationPreferenceCard() {
           if (!res.ok) throw new Error("Failed to register subscription");
 
           setSubscribed(true);
+          dispatchNotificationStateChange(true);
           toast.success("🕉️ Subscribed to Temple Notifications");
         } else if (perm === "denied") {
           toast.error("Notifications are blocked in your browser settings.");

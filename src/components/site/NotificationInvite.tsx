@@ -2,7 +2,13 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Bell, Check, X } from "lucide-react";
 import { toast } from "sonner";
-import { base64UrlToUint8Array, canUseWebPush, PROMPT_OPEN_EVENT } from "@/lib/push";
+import {
+  base64UrlToUint8Array,
+  canUseWebPush,
+  dispatchNotificationStateChange,
+  NOTIFICATION_STATE_CHANGED_EVENT,
+  PROMPT_OPEN_EVENT,
+} from "@/lib/push";
 
 const NOTIFICATION_HANDLED_KEY = "temple-notification-onboarding-handled";
 const NOTIFICATION_DELAY_MS = 12_000; // Exactly 12 seconds for new visitors
@@ -58,10 +64,21 @@ export function NotificationInvite() {
         setVisible(false);
       }
     };
+
+    const closeForStateChange = (event: Event) => {
+      const customEvent = event as CustomEvent<{ subscribed?: boolean }>;
+      if (customEvent.detail?.subscribed) {
+        markNotificationHandled();
+        setVisible(false);
+      }
+    };
+
     window.addEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
+    window.addEventListener(NOTIFICATION_STATE_CHANGED_EVENT, closeForStateChange);
 
     return () => {
       window.removeEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
+      window.removeEventListener(NOTIFICATION_STATE_CHANGED_EVENT, closeForStateChange);
       if (timer) window.clearTimeout(timer);
     };
   }, []);
@@ -95,6 +112,7 @@ export function NotificationInvite() {
       });
       if (!response.ok) throw new Error("Subscription could not be saved");
       markNotificationHandled();
+      dispatchNotificationStateChange(true);
       setVisible(false);
       toast.success("🕉️ You're now connected");
     } catch {

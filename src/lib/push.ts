@@ -7,6 +7,17 @@ export type StoredPushSubscription = {
 export const INSTALL_AVAILABLE_EVENT = "temple:install-available";
 export const REQUEST_INSTALL_EVENT = "temple:request-install";
 export const PROMPT_OPEN_EVENT = "temple:prompt-open";
+export const NOTIFICATION_STATE_CHANGED_EVENT = "temple:notification-state-changed";
+
+export function dispatchNotificationStateChange(subscribed?: boolean) {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent(NOTIFICATION_STATE_CHANGED_EVENT, {
+        detail: { subscribed },
+      }),
+    );
+  }
+}
 
 export function isStandalonePwa() {
   return (
