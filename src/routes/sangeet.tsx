@@ -5,6 +5,7 @@ import { Footer } from "@/components/site/Footer";
 import { Navbar } from "@/components/site/Navbar";
 import { Section, SectionHeading } from "@/components/site/Section";
 import { createSeoHead, SEO_PAGES } from "@/lib/seo";
+import { useLanguage } from "@/lib/i18n";
 
 const PLAYLIST_URL = "https://open.spotify.com/playlist/2WnKf0Y1GYbtnJOkQtmalX";
 const PLAYLIST_EMBED_URL =
@@ -16,6 +17,8 @@ export const Route = createFileRoute("/sangeet")({
 });
 
 function SangeetPage() {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-dvh bg-background">
       <Navbar />
@@ -25,11 +28,15 @@ function SangeetPage() {
           id="sangeet"
           className="bg-gradient-to-b from-secondary/70 via-background to-background pb-14 pt-36 sm:pb-16 sm:pt-40"
         >
-          <SectionHeading eyebrow="Devotional Music" title="Sangeet 🎵">
-            Listen to Shiv Bhajans, Stotrams, Mantras, and Devotional Music.
+          <SectionHeading
+            eyebrow={t.sangeet.eyebrow}
+            title={t.sangeet.title}
+            hindi={t.sangeet.hindi}
+          >
+            {t.sangeet.subtitle}
           </SectionHeading>
           <p className="mx-auto mt-5 max-w-2xl text-center text-sm leading-relaxed text-muted-foreground sm:text-base">
-            A collection of devotional music dedicated to Lord Shiva and spiritual practice.
+            {t.sangeet.description}
           </p>
         </Section>
 
@@ -40,13 +47,13 @@ function SangeetPage() {
                 <Music2 className="h-6 w-6" aria-hidden="true" />
               </div>
               <h2 className="mt-6 font-display text-3xl font-semibold leading-tight text-ink">
-                Dariyapur Shiv Mandir Kanti
+                {t.location.templeName}
               </h2>
               <p className="mt-2 text-sm font-semibold uppercase tracking-wider text-saffron-deep">
-                Official Devotional Music Playlist
+                {t.sangeet.playlistBadge}
               </p>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Listen to Shiv Bhajans, Mantras, Stotrams and Sacred Music.
+                {t.sangeet.playlistDesc}
               </p>
               <div className="mt-7">
                 <a
@@ -55,7 +62,7 @@ function SangeetPage() {
                   rel="noreferrer"
                   className="interactive-surface inline-flex min-h-11 items-center justify-center gap-2 rounded-full gradient-saffron px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sacred"
                 >
-                  Open Playlist in Spotify
+                  {t.sangeet.openSpotifyBtn}
                   <ExternalLink className="h-4 w-4" aria-hidden="true" />
                 </a>
               </div>
@@ -71,7 +78,7 @@ function SangeetPage() {
               “नाद ही ब्रह्म है”
             </p>
             <p className="mt-5 font-display text-xl text-ink sm:text-2xl">
-              Music is a path to devotion and inner peace.
+              {t.sangeet.quote}
             </p>
           </blockquote>
         </Section>

@@ -2,9 +2,11 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Camera, MapPin, Maximize2 } from "lucide-react";
 import type { WikimediaFile } from "@/lib/wikimedia/commons";
+import { useLanguage } from "@/lib/i18n";
 import { WikimediaImageModal } from "./WikimediaImageModal";
 
 export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
+  const { t } = useLanguage();
   const [selectedFile, setSelectedFile] = useState<WikimediaFile | null>(null);
 
   if (!files.length) return null;
@@ -53,7 +55,7 @@ export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
               <div className="absolute left-4 top-4 right-4 flex items-center justify-between gap-2 sm:left-6 sm:top-6 sm:right-6">
                 <div className="inline-flex items-center gap-1.5 rounded-full bg-ink/75 px-3 py-1 text-[11px] font-semibold tracking-wider text-gold-soft backdrop-blur-sm">
                   <Camera className="h-3 w-3 text-gold" />
-                  Featured Wikimedia Media
+                  {t.heritage.featuredMediaBadge}
                 </div>
                 <div className="inline-flex items-center gap-1 rounded-full bg-cream/90 px-2.5 py-0.5 text-[10px] font-bold text-ink shadow-sm">
                   {featured.license}
@@ -82,7 +84,7 @@ export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
                 </p>
 
                 <div className="mt-4 flex items-center gap-2 text-xs font-semibold text-gold-soft">
-                  <span>Click to explore metadata &amp; licensing</span>
+                  <span>{t.heritage.clickToExplore}</span>
                   <Maximize2 className="h-3.5 w-3.5 transition-transform duration-300 group-hover:scale-110" />
                 </div>
               </div>
@@ -142,7 +144,7 @@ export function WikimediaGallery({ files }: { files: WikimediaFile[] }) {
                 <div className="mt-1 flex items-center justify-between text-[11px] text-cream/75">
                   <span className="truncate">{file.date || "Wikimedia Commons"}</span>
                   <span className="flex items-center gap-1 font-medium text-gold-soft group-hover:underline">
-                    Details <Maximize2 className="h-3 w-3" />
+                    {t.heritage.detailsLabel} <Maximize2 className="h-3 w-3" />
                   </span>
                 </div>
               </div>

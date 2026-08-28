@@ -17,7 +17,6 @@ import {
   Navigation,
   Plus,
   Search,
-  Sparkles,
   X,
 } from "lucide-react";
 import { getCmsContent } from "@/lib/api/cms.functions";
@@ -25,6 +24,7 @@ import type { CmsContent } from "@/lib/sanity/types";
 import { DEFAULT_FAQS, FAQ_CATEGORIES, type TempleFaq } from "@/lib/faq";
 import { HERO_IMAGE } from "@/lib/media";
 import { createSeoHead, SEO_PAGES } from "@/lib/seo";
+import { useLanguage } from "@/lib/i18n";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Section } from "@/components/site/Section";
@@ -77,9 +77,20 @@ function FaqPage() {
 }
 
 function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
+  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<(typeof ALL_CATEGORIES)[number]>("All");
   const [expandedId, setExpandedId] = useState<string | undefined>("faq-location-1");
+
+  const categoryLabels: Record<(typeof ALL_CATEGORIES)[number], string> = {
+    All: t.faq.categories.all,
+    Temple: t.faq.categories.temple,
+    "Timings & Aarti": t.faq.categories.timings,
+    Location: t.faq.categories.location,
+    Seva: t.faq.categories.seva,
+    Festivals: t.faq.categories.festivals,
+    General: t.faq.categories.general,
+  };
 
   const filteredFaqs = useMemo(() => {
     const searchTerm = search.trim().toLocaleLowerCase();
@@ -135,14 +146,14 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
               </div>
 
               <h1 className="font-display text-4xl font-bold tracking-tight text-cream sm:text-5xl lg:text-6xl">
-                Frequently Asked Questions
+                {t.faq.title}
               </h1>
 
               <p className="mt-4 text-base leading-relaxed text-cream/90 sm:text-lg">
-                Find answers to common questions about
+                {t.faq.subtitle}
               </p>
               <p className="mt-1 font-display text-xl font-bold text-gold-soft sm:text-2xl">
-                Dariyapur Shiv Mandir Kanti
+                {t.faq.templeName}
               </p>
             </motion.div>
           </div>
@@ -159,7 +170,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
               className="relative mx-auto"
             >
               <label htmlFor="faq-search" className="sr-only">
-                Search frequently asked questions
+                {t.faq.searchPlaceholder}
               </label>
               <div className="relative flex items-center rounded-2xl border border-gold/40 bg-card px-4 shadow-sm transition focus-within:border-saffron focus-within:ring-2 focus-within:ring-saffron/30">
                 <Search
@@ -171,7 +182,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                   type="search"
                   value={search}
                   onChange={(event) => setSearch(event.target.value)}
-                  placeholder="Search your question..."
+                  placeholder={t.faq.searchPlaceholder}
                   className="min-w-0 flex-1 bg-transparent py-4 pl-3 pr-2 text-sm text-ink outline-none placeholder:text-muted-foreground sm:text-base"
                 />
                 {search && (
@@ -179,7 +190,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                     type="button"
                     onClick={() => setSearch("")}
                     className="interactive-surface grid h-8 w-8 shrink-0 place-items-center rounded-full text-saffron-deep hover:bg-saffron/10 focus-visible:ring-saffron"
-                    aria-label="Clear search"
+                    aria-label={t.faq.clearSearchAria}
                   >
                     <X className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -191,7 +202,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
             <div className="my-8 flex items-center gap-4" aria-hidden="true">
               <span className="h-px flex-1 bg-gold/40" />
               <h2 className="font-display text-lg font-bold text-ink sm:text-xl">
-                Browse by Category
+                {t.faq.browseByCategory}
               </h2>
               <span className="h-px flex-1 bg-gold/40" />
             </div>
@@ -224,7 +235,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                       }`}
                       aria-hidden="true"
                     />
-                    <span className="text-xs font-semibold leading-tight">{item}</span>
+                    <span className="text-xs font-semibold leading-tight">{categoryLabels[item]}</span>
                   </button>
                 );
               })}
@@ -320,7 +331,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                                     className="interactive-surface inline-flex items-center gap-1.5 rounded-lg gradient-saffron px-3.5 py-2 text-xs font-semibold text-primary-foreground shadow-sacred hover:shadow-glow"
                                   >
                                     <MapPin className="h-3.5 w-3.5 text-gold-soft" aria-hidden="true" />
-                                    <span>View on Google Maps</span>
+                                    <span>{t.faq.viewGoogleMaps}</span>
                                     <ExternalLink className="h-3 w-3 opacity-80" aria-hidden="true" />
                                   </a>
                                   <a
@@ -328,7 +339,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                                     className="interactive-surface inline-flex items-center gap-1.5 rounded-lg border border-gold/50 bg-cream/90 px-3.5 py-2 text-xs font-semibold text-saffron-deep hover:bg-gold-soft/30"
                                   >
                                     <Navigation className="h-3.5 w-3.5 text-saffron-deep" aria-hidden="true" />
-                                    <span>Detailed Directions & Map</span>
+                                    <span>{t.faq.detailedDirections}</span>
                                   </a>
                                 </div>
                               )}
@@ -350,12 +361,12 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                   <Search className="h-6 w-6" aria-hidden="true" />
                 </div>
                 <h3 className="mt-4 font-display text-xl font-bold text-ink">
-                  We couldn't find any questions matching your search.
+                  {t.faq.noMatchTitle}
                 </h3>
                 <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground sm:text-base">
                   {search
-                    ? `No questions matched "${search}". Try searching with different keywords or select another category.`
-                    : "No questions are currently available in this category."}
+                    ? t.faq.noMatchDesc.replace("{search}", search)
+                    : t.faq.noCategoryDesc}
                 </p>
                 <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
                   <button
@@ -363,13 +374,13 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                     onClick={clearFilters}
                     className="interactive-surface inline-flex min-h-10 items-center justify-center rounded-xl gradient-saffron px-5 text-xs font-semibold text-primary-foreground shadow-sacred hover:shadow-glow"
                   >
-                    Clear Search & Show All
+                    {t.faq.clearSearchBtn}
                   </button>
                   <a
                     href="/contact"
                     className="interactive-surface inline-flex min-h-10 items-center justify-center rounded-xl border border-gold/50 bg-card px-5 text-xs font-semibold text-saffron-deep hover:bg-gold-soft/30"
                   >
-                    Contact Temple
+                    {t.faq.contactBtn}
                   </a>
                 </div>
               </div>
@@ -390,10 +401,10 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                   </div>
                   <div>
                     <h3 className="font-display text-xl font-bold text-ink sm:text-2xl">
-                      Still have a question?
+                      {t.faq.stillHaveQuestion}
                     </h3>
                     <p className="mt-0.5 text-sm text-muted-foreground sm:text-base">
-                      We are here to help you.
+                      {t.faq.weAreHereToHelp}
                     </p>
                   </div>
                 </div>
@@ -401,7 +412,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                   href="/contact"
                   className="interactive-surface inline-flex min-h-11 w-full items-center justify-center rounded-xl gradient-saffron px-7 text-sm font-semibold text-primary-foreground shadow-sacred hover:shadow-glow sm:w-auto"
                 >
-                  Contact Temple
+                  {t.faq.contactBtn}
                 </a>
               </div>
             </motion.div>

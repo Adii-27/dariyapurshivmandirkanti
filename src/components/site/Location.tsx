@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { TEMPLE_EMAIL } from "@/lib/contact";
 import { TEMPLE_GLIMPSES } from "@/lib/media";
+import { useLanguage } from "@/lib/i18n";
 import { AutoScrollCarousel } from "./AutoScrollCarousel";
 import { Section, SectionHeading } from "./Section";
 
@@ -81,29 +82,6 @@ const DEVOTIONAL_QUOTES = [
   "शिव ही सत्य हैं, शिव ही सुंदर हैं",
 ] as const;
 
-const LANDMARKS = [
-  {
-    name: "Kanti Railway Station",
-    distance: "~2.8 km",
-    icon: TrainFront,
-  },
-  {
-    name: "Kanti Thermal Power Station",
-    distance: "~3.5 km",
-    icon: Building2,
-  },
-  {
-    name: "NH-27 Route",
-    distance: "~1.5 km",
-    icon: Route,
-  },
-  {
-    name: "Kanti Block Head Office",
-    distance: "~4 km",
-    icon: Building2,
-  },
-];
-
 type MapEmbedState = "loading" | "loaded" | "fallback";
 
 function isKnownInAppBrowser(userAgent: string) {
@@ -111,15 +89,39 @@ function isKnownInAppBrowser(userAgent: string) {
 }
 
 export function Location() {
+  const { t } = useLanguage();
+
+  const landmarks = [
+    {
+      name: t.location.landmarkRailway,
+      distance: "~2.8 km",
+      icon: TrainFront,
+    },
+    {
+      name: t.location.landmarkThermal,
+      distance: "~3.5 km",
+      icon: Building2,
+    },
+    {
+      name: t.location.landmarkNh27,
+      distance: "~1.5 km",
+      icon: Route,
+    },
+    {
+      name: t.location.landmarkBlock,
+      distance: "~4 km",
+      icon: Building2,
+    },
+  ];
+
   return (
     <Section id="location" className="bg-cream/55">
       <SectionHeading
-        eyebrow="Location & Directions"
-        title="Find Your Way to the Mandir"
-        hindi="मंदिर तक पहुँचें"
+        eyebrow={t.location.eyebrow}
+        title={t.location.title}
+        hindi={t.location.hindi}
       >
-        Located in Dariyapur, Kanti and easily reachable by road. Use the embedded map or open
-        turn-by-turn directions on your phone.
+        {t.location.subtitle}
       </SectionHeading>
 
       <div className="mt-12 grid items-stretch gap-6 lg:grid-cols-[1.4fr_1fr] lg:grid-rows-[auto_1fr]">
@@ -137,10 +139,10 @@ export function Location() {
               </div>
               <div className="min-w-0">
                 <h3 className="font-display text-2xl font-bold leading-tight text-ink">
-                  Dariyapur Shiv Mandir Kanti
+                  {t.location.templeName}
                 </h3>
                 <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-                  Dariyapur, Kanti, Muzaffarpur, Bihar
+                  {t.location.addressText}
                 </p>
               </div>
             </div>
@@ -151,7 +153,7 @@ export function Location() {
                 rel="noreferrer"
                 className="interactive-surface inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl gradient-saffron px-5 text-sm font-semibold text-primary-foreground shadow-sacred sm:flex-none"
               >
-                Open Google Maps
+                {t.location.openMapsBtn}
                 <ExternalLink className="h-4 w-4" />
               </a>
               <a
@@ -179,23 +181,23 @@ export function Location() {
             <Navigation className="mt-1 h-6 w-6 shrink-0 text-saffron-deep" />
             <div>
               <h3 className="font-display text-2xl font-bold text-ink">
-                Directions and Nearby Landmarks
+                {t.location.landmarksTitle}
               </h3>
               <div className="mt-5 space-y-4 text-sm leading-relaxed text-ink/75 sm:text-base">
                 <p>
-                  <strong className="font-semibold text-ink">By road:</strong> Local transport is
-                  available from the Muzaffarpur-Kanti route towards Dariyapur.
+                  <strong className="font-semibold text-ink">{t.location.travelRoadTitle}:</strong>{" "}
+                  {t.location.travelRoadDesc}
                 </p>
                 <p>
-                  <strong className="font-semibold text-ink">By rail:</strong> The temple can be
-                  reached from Kanti Railway Station and Muzaffarpur Junction.
+                  <strong className="font-semibold text-ink">{t.location.travelTrainTitle}:</strong>{" "}
+                  {t.location.travelTrainDesc}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mt-6 grid gap-3 min-[430px]:grid-cols-2">
-            {LANDMARKS.map((landmark) => (
+            {landmarks.map((landmark) => (
               <div
                 key={landmark.name}
                 className="interactive-surface min-h-28 rounded-xl border border-border bg-cream/35 p-4 hover:border-gold/50 hover:bg-gold-soft/30 sm:min-h-32"
@@ -298,7 +300,7 @@ export function Location() {
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
-        <span>Dariyapur Village, Kanti, Muzaffarpur District, Bihar, India</span>
+        <span>{t.location.addressText}</span>
         <span className="hidden h-1 w-1 rounded-full bg-saffron-deep/60 sm:block" />
         <span className="tabular-nums">
           {TEMPLE_LAT.toFixed(6)}°N, {TEMPLE_LNG.toFixed(6)}°E
@@ -309,7 +311,7 @@ export function Location() {
           rel="noreferrer"
           className="inline-flex items-center gap-1 font-semibold text-saffron-deep hover:underline"
         >
-          Get Directions
+          {t.location.directionsBtn}
           <ExternalLink className="h-3 w-3" />
         </a>
       </div>
@@ -348,38 +350,39 @@ function GoogleMapEmbed() {
     };
 
     const renderMap = () => {
-      if (hasResolved.current || hasStartedRendering.current) return;
+      if (hasStartedRendering.current) return;
       hasStartedRendering.current = true;
+
+      const userAgent = typeof navigator !== "undefined" ? navigator.userAgent : "";
+      if (isKnownInAppBrowser(userAgent)) {
+        resolveAsFallback();
+        return;
+      }
+
       setShouldRenderMap(true);
       startLoadTimeout();
     };
 
-    const userAgent = window.navigator.userAgent || "";
-
-    if (isKnownInAppBrowser(userAgent)) {
-      resolveAsFallback();
-      return;
-    }
-
     const container = mapContainerRef.current;
-
     if (!container || !("IntersectionObserver" in window)) {
       renderMap();
-      return () => clearLoadTimeout();
+      return () => {
+        clearLoadTimeout();
+      };
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        renderMap();
-        observer.disconnect();
-        observerRef.current = null;
+    observerRef.current = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          renderMap();
+          observerRef.current?.disconnect();
+          observerRef.current = null;
+        }
       },
-      { rootMargin: MAP_INTERSECTION_ROOT_MARGIN, threshold: 0.01 },
+      { rootMargin: MAP_INTERSECTION_ROOT_MARGIN },
     );
 
-    observer.observe(container);
-    observerRef.current = observer;
+    observerRef.current.observe(container);
 
     return () => {
       clearLoadTimeout();
@@ -395,8 +398,6 @@ function GoogleMapEmbed() {
       window.clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    observerRef.current?.disconnect();
-    observerRef.current = null;
     setMapState("loaded");
   };
 
@@ -439,6 +440,8 @@ function GoogleMapEmbed() {
 }
 
 function MapLoadingState() {
+  const { t } = useLanguage();
+
   return (
     <div
       className="absolute inset-0 grid place-items-center px-5 py-8 text-center sm:px-8"
@@ -451,10 +454,10 @@ function MapLoadingState() {
           <span className="h-7 w-7 animate-spin rounded-full border-2 border-saffron-deep/25 border-t-saffron-deep" />
         </div>
         <p className="mt-5 font-display text-xl font-bold text-ink sm:text-2xl">
-          Loading Temple Map
+          {t.location.mapLoadingTitle}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Preparing the interactive Google Map.
+          {t.location.mapLoadingDesc}
         </p>
       </div>
     </div>
@@ -462,6 +465,8 @@ function MapLoadingState() {
 }
 
 function MapFallbackCard() {
+  const { t } = useLanguage();
+
   return (
     <div
       className="absolute inset-0 grid place-items-center px-4 py-6 text-center sm:px-8"
@@ -473,13 +478,13 @@ function MapFallbackCard() {
           <MapPin className="h-7 w-7" aria-hidden="true" />
         </div>
         <h3 className="mt-5 font-display text-xl font-bold text-ink sm:text-2xl">
-          Temple Location
+          {t.location.mapFallbackTitle}
         </h3>
         <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          The interactive map is unavailable in this browser.
+          {t.location.mapFallbackDesc}
         </p>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Some apps (Instagram, Facebook, Messenger, etc.) may block embedded maps.
+          {t.location.mapFallbackNote}
         </p>
         <a
           href={MAPS_URL}
@@ -488,12 +493,12 @@ function MapFallbackCard() {
           aria-label="Open Dariyapur Shiv Mandir Kanti in Google Maps"
           className="interactive-surface mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl gradient-saffron px-5 text-sm font-semibold text-primary-foreground shadow-sacred sm:w-auto"
         >
-          Open Google Maps
+          {t.location.openMapsBtn}
           <ExternalLink className="h-4 w-4" aria-hidden="true" />
         </a>
         <address className="mt-5 break-words not-italic text-sm leading-relaxed text-ink/75 sm:text-base">
-          <span className="block font-semibold text-ink">Dariyapur Shiv Mandir Kanti</span>
-          <span className="block">Dariyapur, Kanti, Muzaffarpur, Bihar</span>
+          <span className="block font-semibold text-ink">{t.location.templeName}</span>
+          <span className="block">{t.location.addressText}</span>
         </address>
       </div>
     </div>
@@ -501,6 +506,7 @@ function MapFallbackCard() {
 }
 
 export function Contact() {
+  const { t } = useLanguage();
   const [sent, setSent] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -565,7 +571,7 @@ export function Contact() {
 
     if (!serviceId || !templateId || !publicKey) {
       setSent(false);
-      setSubmissionError("We could not send your message right now. Please try again shortly.");
+      setSubmissionError(t.contact.errorMessage);
       return;
     }
 
@@ -593,7 +599,7 @@ export function Contact() {
       setSent(true);
     } catch (error) {
       console.error("EmailJS contact form submission failed.", error);
-      setSubmissionError("We could not send your message right now. Please try again shortly.");
+      setSubmissionError(t.contact.errorMessage);
     } finally {
       submittingRef.current = false;
       setIsSubmitting(false);
@@ -635,16 +641,22 @@ export function Contact() {
 
   return (
     <Section id="contact" className="bg-gradient-to-b from-cream via-secondary/40 to-cream">
-      <SectionHeading eyebrow="Contact Us" title="We're Here for You" hindi="संपर्क करें">
-        Reach out for darshan timings, festival schedules or to share your seva.
+      <SectionHeading
+        eyebrow={t.contact.eyebrow}
+        title={t.contact.title}
+        hindi={t.contact.hindi}
+      >
+        {t.contact.subtitle}
       </SectionHeading>
 
       <div className="mt-12 grid gap-8 lg:grid-cols-2">
         <div className="min-w-0 space-y-4">
           <div className="mb-6">
-            <h3 className="font-display text-3xl font-semibold text-ink">Get In Touch</h3>
+            <h3 className="font-display text-3xl font-semibold text-ink">
+              {t.contact.getInTouchTitle}
+            </h3>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-              Contact the temple team or use the feedback form to share your message.
+              {t.contact.getInTouchDesc}
             </p>
           </div>
           <div>
@@ -667,7 +679,7 @@ export function Contact() {
               </div>
               <div className="min-w-0">
                 <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                  Temple Email
+                  {t.contact.emailLabel}
                 </div>
                 <div className="break-words font-medium text-ink [overflow-wrap:anywhere]">
                   {TEMPLE_EMAIL}
@@ -692,7 +704,7 @@ export function Contact() {
                   aria-live="polite"
                   className="mt-2 px-2 text-xs font-medium text-saffron-deep"
                 >
-                  Email copied successfully.
+                  {t.contact.emailCopiedToast}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -700,8 +712,8 @@ export function Contact() {
 
           <ContactCard
             icon={MapPin}
-            label="Temple Address"
-            value="Dariyapur Village, Kanti, Muzaffarpur District, Bihar, India"
+            label={t.contact.addressLabel}
+            value={t.contact.addressValue}
             href={MAPS_URL}
             external
           />
@@ -729,7 +741,7 @@ export function Contact() {
             </div>
             <div className="min-w-0">
               <div className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Devotional Reflection
+                {t.contact.reflectionLabel}
               </div>
               <div className="mt-1 min-h-12">
                 <AnimatePresence mode="wait" initial={false}>
@@ -757,13 +769,15 @@ export function Contact() {
           }}
           className="min-w-0 rounded-3xl border border-gold/40 bg-card/85 p-5 shadow-sacred backdrop-blur sm:p-9"
         >
-          <h3 className="font-display text-2xl font-semibold text-ink">Send a Message</h3>
+          <h3 className="font-display text-2xl font-semibold text-ink">
+            {t.contact.formTitle}
+          </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            Send your inquiry to the temple team using the form below.
+            {t.contact.formSubtitle}
           </p>
 
           <div className="mt-6 space-y-4">
-            <Field label="Your Name" id="name">
+            <Field label={t.contact.nameLabel} id="name">
               <input
                 required
                 minLength={2}
@@ -772,11 +786,11 @@ export function Contact() {
                 name="name"
                 type="text"
                 autoComplete="name"
-                placeholder="Devotee name"
+                placeholder={t.contact.namePlaceholder}
                 className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/30"
               />
             </Field>
-            <Field label="Email Address" id="email">
+            <Field label={t.contact.emailLabelForm} id="email">
               <input
                 required
                 maxLength={120}
@@ -784,25 +798,11 @@ export function Contact() {
                 name="email"
                 type="email"
                 autoComplete="email"
-                placeholder="you@example.com"
-                onInvalid={(event) => {
-                  event.currentTarget.setCustomValidity(
-                    event.currentTarget.validity.valueMissing
-                      ? "Please enter your email address."
-                      : "Please enter a valid email address.",
-                  );
-                }}
-                onInput={(event) => {
-                  event.currentTarget.setCustomValidity(
-                    event.currentTarget.validity.typeMismatch
-                      ? "Please enter a valid email address."
-                      : "",
-                  );
-                }}
+                placeholder={t.contact.emailPlaceholder}
                 className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/30"
               />
             </Field>
-            <Field label="Phone Number (Optional)" id="phone">
+            <Field label={t.contact.phoneLabel} id="phone">
               <input
                 maxLength={30}
                 id="phone"
@@ -811,23 +811,12 @@ export function Contact() {
                 autoComplete="tel"
                 inputMode="tel"
                 pattern="(?:\+91|91|0)?(?:\s|-)?[6-9](?:(?:\s|-)?[0-9]){9}"
-                placeholder="Enter your phone number"
+                placeholder={t.contact.phonePlaceholder}
                 title="Enter a valid Indian phone number"
-                onInvalid={(event) =>
-                  event.currentTarget.setCustomValidity("Please enter a valid Indian phone number.")
-                }
-                onInput={(event) => {
-                  const value = event.currentTarget.value.trim();
-                  const normalized = value.replace(/[\s-]/g, "");
-                  const isValid = value === "" || /^(?:\+91|91|0)?[6-9][0-9]{9}$/.test(normalized);
-                  event.currentTarget.setCustomValidity(
-                    isValid ? "" : "Please enter a valid Indian phone number.",
-                  );
-                }}
                 className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/30"
               />
             </Field>
-            <Field label="Subject" id="subject">
+            <Field label={t.contact.subjectLabel} id="subject">
               <select
                 required
                 id="subject"
@@ -836,16 +825,16 @@ export function Contact() {
                 className="w-full rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/30"
               >
                 <option value="" disabled>
-                  Select a purpose
+                  {t.contact.subjectPlaceholder}
                 </option>
-                <option value="General Inquiry">General Inquiry</option>
-                <option value="Festival Information">Festival Information</option>
-                <option value="Temple Timings">Temple Timings</option>
-                <option value="Volunteer Service">Volunteer Service</option>
-                <option value="Feedback">Feedback</option>
+                <option value="General Inquiry">{t.contact.purposeGeneral}</option>
+                <option value="Festival Information">{t.contact.purposeFestival}</option>
+                <option value="Temple Timings">{t.contact.purposeTimings}</option>
+                <option value="Volunteer Service">{t.contact.purposeVolunteer}</option>
+                <option value="Feedback">{t.contact.purposeFeedback}</option>
               </select>
             </Field>
-            <Field label="Message" id="message">
+            <Field label={t.contact.messageLabel} id="message">
               <textarea
                 required
                 minLength={10}
@@ -853,7 +842,7 @@ export function Contact() {
                 id="message"
                 name="message"
                 rows={4}
-                placeholder="Your message..."
+                placeholder={t.contact.messagePlaceholder}
                 className="w-full resize-none rounded-xl border border-input bg-background px-4 py-3 text-sm outline-none transition focus:border-saffron focus:ring-2 focus:ring-saffron/30"
               />
             </Field>
@@ -872,7 +861,7 @@ export function Contact() {
               className="inline-flex w-full items-center justify-center gap-2 rounded-xl gradient-saffron px-6 py-3.5 text-sm font-semibold text-primary-foreground shadow-sacred transition-transform hover:scale-[1.02]"
             >
               <Send className="h-4 w-4" />
-              {isSubmitting ? "Sending..." : "Send Message"}
+              {isSubmitting ? t.contact.sendingBtn : t.contact.sendBtn}
             </button>
             <AnimatePresence>
               {sent && (
@@ -884,7 +873,7 @@ export function Contact() {
                   aria-live="polite"
                   className="rounded-xl border border-gold/40 bg-saffron/10 px-4 py-3 text-center text-sm font-medium text-ink"
                 >
-                  Thank you for contacting Dariyapur Shiv Mandir Kanti. We will respond soon.
+                  {t.contact.successMessage}
                 </motion.p>
               )}
             </AnimatePresence>

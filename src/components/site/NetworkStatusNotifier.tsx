@@ -1,5 +1,6 @@
 import { useEffect, useRef, type MutableRefObject } from "react";
 import { toast } from "sonner";
+import { useLanguage } from "@/lib/i18n";
 
 const LOADING_NOTICE_DELAY_MS = 3000;
 const SLOW_LOAD_NOTICE_DELAY_MS = 5000;
@@ -24,38 +25,6 @@ type NavigatorWithConnection = Navigator & {
   webkitConnection?: NetworkInformation;
 };
 
-const NOTICE_CONTENT: Record<
-  NetworkNotice,
-  { title: string; description: string; icon: string; duration: number }
-> = {
-  loading: {
-    title: "Loading Content",
-    description: "Please wait while the temple website loads.",
-    icon: "⏳",
-    duration: Infinity,
-  },
-  slow: {
-    title: "Slow Internet Connection",
-    description:
-      "Your network appears to be slow. Some content may take longer to load. Please wait a moment.",
-    icon: "⚠️",
-    duration: Infinity,
-  },
-  offline: {
-    title: "No Internet Connection",
-    description:
-      "Your internet connection appears to be unavailable. Some content may not load until your connection is restored.",
-    icon: "📡",
-    duration: Infinity,
-  },
-  restored: {
-    title: "Connection Restored",
-    description: "Your internet connection has been restored.",
-    icon: "✅",
-    duration: RESTORED_NOTICE_DURATION_MS,
-  },
-};
-
 function getNetworkConnection() {
   const nav = window.navigator as NavigatorWithConnection;
   return nav.connection ?? nav.mozConnection ?? nav.webkitConnection;
@@ -65,30 +34,61 @@ function isSlowConnection(connection: NetworkInformation | undefined) {
   return connection?.effectiveType === "slow-2g" || connection?.effectiveType === "2g";
 }
 
-function showNetworkToast(notice: NetworkNotice) {
-  const content = NOTICE_CONTENT[notice];
-
-  toast(content.title, {
-    id: NETWORK_TOAST_IDS[notice],
-    description: content.description,
-    icon: <span aria-hidden="true">{content.icon}</span>,
-    duration: content.duration,
-    className:
-      "border-gold/40 bg-card/95 text-ink shadow-sacred backdrop-blur supports-[backdrop-filter]:bg-card/90",
-    descriptionClassName: "text-muted-foreground leading-relaxed",
-  });
-}
-
 function dismissNetworkToast(notice: NetworkNotice) {
   toast.dismiss(NETWORK_TOAST_IDS[notice]);
 }
 
 export function NetworkStatusNotifier() {
+  const { t } = useLanguage();
   const activeNoticeRef = useRef<NetworkNotice | null>(null);
   const pageLoadedRef = useRef(false);
   const loadingTimerRef = useRef<number | null>(null);
   const slowLoadTimerRef = useRef<number | null>(null);
   const restoredDismissTimerRef = useRef<number | null>(null);
+
+  const noticeContent: Record<
+    NetworkNotice,
+    { title: string; description: string; icon: string; duration: number }
+  > = {
+    loading: {
+      title: t.network.loadingTitle,
+      description: t.network.loadingDesc,
+      icon: "⏳",
+      duration: Infinity,
+    },
+    slow: {
+      title: t.network.slowTitle,
+      description: t.network.slowDesc,
+      icon: "⚠️",
+      duration: Infinity,
+    },
+    offline: {
+      title: t.network.offlineTitle,
+      description: t.network.offlineDesc,
+      icon: "📡",
+      duration: Infinity,
+    },
+    restored: {
+      title: t.network.restoredTitle,
+      description: t.network.restoredDesc,
+      icon: "✅",
+      duration: RESTORED_NOTICE_DURATION_MS,
+    },
+  };
+
+  const showNetworkToast = (notice: NetworkNotice) => {
+    const content = noticeContent[notice];
+
+    toast(content.title, {
+      id: NETWORK_TOAST_IDS[notice],
+      description: content.description,
+      icon: <span aria-hidden="true">{content.icon}</span>,
+      duration: content.duration,
+      className:
+        "border-gold/40 bg-card/95 text-ink shadow-sacred backdrop-blur supports-[backdrop-filter]:bg-card/90",
+      descriptionClassName: "text-muted-foreground leading-relaxed",
+    });
+  };
 
   useEffect(() => {
     const clearTimer = (timerRef: MutableRefObject<number | null>) => {
@@ -203,7 +203,7 @@ export function NetworkStatusNotifier() {
       window.removeEventListener("online", handleOnline);
       connection?.removeEventListener?.("change", handleConnectionChange);
     };
-  }, []);
+  }, [t]);
 
   return null;
 }

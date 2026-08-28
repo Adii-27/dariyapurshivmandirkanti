@@ -8,6 +8,7 @@ import {
   PROMPT_OPEN_EVENT,
   REQUEST_INSTALL_EVENT,
 } from "@/lib/push";
+import { useLanguage } from "@/lib/i18n";
 
 type DeferredInstallPrompt = Event & {
   prompt: () => Promise<void>;
@@ -34,6 +35,7 @@ function markInstallHandled() {
 }
 
 export function PwaInstallPrompt() {
+  const { t } = useLanguage();
   const [deferredPrompt, setDeferredPrompt] = useState<DeferredInstallPrompt | null>(null);
   const deferredPromptRef = useRef<DeferredInstallPrompt | null>(null);
   const [visible, setVisible] = useState(false);
@@ -109,7 +111,7 @@ export function PwaInstallPrompt() {
       await deferredPrompt.prompt();
       const choice = await deferredPrompt.userChoice;
       if (choice.outcome === "accepted") {
-        toast.success("Dariyapur Shiv Mandir has been added to your device.");
+        toast.success(t.pwa.installedToast);
       }
       markInstallHandled();
       setVisible(false);
@@ -147,10 +149,10 @@ export function PwaInstallPrompt() {
             </div>
             <div>
               <h2 className="font-display text-lg font-bold text-ink">
-                🛕 Keep Dariyapur With You
+                {t.pwa.promptTitle}
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                Quick access to timings, directions, festivals and temple updates.
+                {t.pwa.promptDesc}
               </p>
             </div>
           </div>
@@ -161,7 +163,7 @@ export function PwaInstallPrompt() {
               disabled={working}
               className="interactive-surface min-h-10 rounded-xl gradient-saffron px-4 text-sm font-semibold text-primary-foreground shadow-sacred disabled:opacity-60"
             >
-              {working ? "Opening..." : "Install App"}
+              {working ? t.pwa.openingBtn : t.pwa.installBtn}
             </button>
             <button
               type="button"
@@ -169,7 +171,7 @@ export function PwaInstallPrompt() {
               disabled={working}
               className="interactive-surface min-h-10 rounded-xl border border-border bg-cream px-4 text-sm font-semibold text-ink hover:bg-secondary disabled:opacity-60"
             >
-              Maybe Later
+              {t.pwa.maybeLaterBtn}
             </button>
           </div>
         </motion.aside>

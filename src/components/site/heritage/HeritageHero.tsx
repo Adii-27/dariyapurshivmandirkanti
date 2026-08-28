@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
 import { Camera, Landmark, Sparkles, MapPin } from "lucide-react";
 import { HERO_IMAGE } from "@/lib/media";
+import { useLanguage } from "@/lib/i18n";
 
 export function HeritageHero() {
+  const { t } = useLanguage();
+
   return (
     <section id="heritage-hero" className="relative isolate overflow-hidden pt-24">
       {/* Background with authentic temple banner */}
@@ -31,22 +34,21 @@ export function HeritageHero() {
             <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/40 bg-ink/40 px-4 py-1.5 backdrop-blur-md">
               <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-glow" />
               <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-gold-soft sm:text-xs">
-                HERITAGE
+                {t.heritage.heroEyebrow}
               </span>
             </div>
 
             <h1 className="mt-6 font-display text-[clamp(2.5rem,11vw,4.25rem)] font-semibold leading-[1.04] tracking-tight text-cream sm:text-6xl">
-              Preserving the Story of{" "}
-              <span className="text-gradient-gold">Dariyapur Shiv Mandir</span>
+              {t.heritage.heroTitle}{" "}
+              <span className="text-gradient-gold">{t.heritage.heroTitleAccent}</span>
             </h1>
 
             <p className="font-hindi mt-3 text-xl font-medium text-gold-soft sm:text-2xl">
-              दरियापुर शिव मंदिर काँटी — धरोहर और संस्कृति
+              {t.heritage.heroHindi}
             </p>
 
             <p className="mt-6 max-w-xl text-base leading-relaxed text-cream/85 sm:text-lg">
-              Documenting the temple's divine presence, cultural heritage and timeless beauty through
-              Wikimedia Commons.
+              {t.heritage.heroSubtitle}
             </p>
 
             {/* Quick Badges */}
@@ -56,37 +58,37 @@ export function HeritageHero() {
                 className="interactive-surface inline-flex min-h-11 items-center gap-2 rounded-full gradient-saffron px-6 py-2.5 text-sm font-semibold text-primary-foreground shadow-sacred hover:shadow-glow"
               >
                 <Camera className="h-4 w-4" />
-                View Commons Collection
+                {t.heritage.viewCollectionBtn}
               </a>
               <a
                 href="#about-temple"
                 className="interactive-surface inline-flex min-h-11 items-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-6 py-2.5 text-sm font-semibold text-cream shadow-sm backdrop-blur-md hover:bg-ink/50 hover:shadow-glow"
               >
                 <Landmark className="h-4 w-4" />
-                About Temple
+                {t.heritage.aboutTempleBtn}
               </a>
             </div>
 
             {/* Verified Fact Ribbon */}
             <div className="mt-10 flex flex-wrap items-center gap-6 border-t border-cream/20 pt-6 text-xs uppercase tracking-[0.18em] text-cream/75">
               <div>
-                <span className="block text-[10px] text-cream/60">Established</span>
+                <span className="block text-[10px] text-cream/60">{t.heritage.estLabel}</span>
                 <span className="text-sm font-semibold normal-case tracking-normal text-gold-soft">
-                  1962
+                  {t.heritage.estValue}
                 </span>
               </div>
               <div className="h-8 w-px bg-cream/20" />
               <div>
-                <span className="block text-[10px] text-cream/60">Dedication</span>
+                <span className="block text-[10px] text-cream/60">{t.heritage.dedicationLabel}</span>
                 <span className="text-sm font-semibold normal-case tracking-normal text-gold-soft">
-                  Lord Shiva
+                  {t.heritage.dedicationValue}
                 </span>
               </div>
               <div className="h-8 w-px bg-cream/20" />
               <div>
-                <span className="block text-[10px] text-cream/60">Archive</span>
+                <span className="block text-[10px] text-cream/60">{t.heritage.archiveLabel}</span>
                 <span className="text-sm font-semibold normal-case tracking-normal text-gold-soft">
-                  Wikimedia Commons
+                  {t.heritage.archiveValue}
                 </span>
               </div>
             </div>
@@ -112,13 +114,13 @@ export function HeritageHero() {
                 <div className="absolute bottom-4 left-4 right-4 text-cream">
                   <div className="inline-flex items-center gap-1.5 rounded-md bg-ink/60 px-2.5 py-1 text-[11px] font-medium text-gold-soft backdrop-blur">
                     <Sparkles className="h-3 w-3 text-gold" />
-                    Cultural Preservation
+                    {t.heritage.preservationBadge}
                   </div>
                   <h2 className="mt-2 font-display text-lg font-semibold leading-snug sm:text-xl">
-                    Dariyapur Shiv Mandir Kanti
+                    {t.heritage.preservationTitle}
                   </h2>
                   <p className="mt-0.5 text-xs text-cream/80">
-                    Documented for Free Knowledge &amp; Digital Heritage
+                    {t.heritage.preservationDesc}
                   </p>
                 </div>
               </div>
@@ -128,10 +130,10 @@ export function HeritageHero() {
                   <MapPin className="h-4 w-4 shrink-0 text-saffron-deep" />
                   <div className="min-w-0">
                     <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Location
+                      {t.heritage.locationLabel}
                     </span>
                     <span className="truncate text-xs font-semibold text-ink">
-                      Kanti, Muzaffarpur
+                      {t.heritage.locationValue}
                     </span>
                   </div>
                 </div>
@@ -139,10 +141,10 @@ export function HeritageHero() {
                   <Camera className="h-4 w-4 shrink-0 text-saffron-deep" />
                   <div className="min-w-0">
                     <span className="block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      Repository
+                      {t.heritage.repositoryLabel}
                     </span>
                     <span className="truncate text-xs font-semibold text-ink">
-                      Wikimedia Commons
+                      {t.heritage.repositoryValue}
                     </span>
                   </div>
                 </div>

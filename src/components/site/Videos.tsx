@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Maximize2, Play, X } from "lucide-react";
 import type { TempleVideo, VideoCategory } from "@/lib/media";
 import { getInitialVideoAspectRatio, isPortraitRatio } from "@/lib/video-presentation";
+import { useLanguage } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
 type Filter = "All Videos" | VideoCategory;
@@ -14,7 +15,7 @@ type LockableScreenOrientation = ScreenOrientation & {
   unlock?: () => void;
 };
 
-const filters: Filter[] = [
+const filterKeys: Filter[] = [
   "All Videos",
   "Temple Introduction",
   "Highlights",
@@ -22,12 +23,20 @@ const filters: Filter[] = [
 ];
 
 export function Videos({ videos = [] }: { videos?: TempleVideo[] }) {
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<Filter>("All Videos");
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [videoAspectRatio, setVideoAspectRatio] = useState(9 / 16);
   const [cardAspectRatios, setCardAspectRatios] = useState<Record<string, number>>({});
   const [isFullscreen, setIsFullscreen] = useState(false);
   const playerRef = useRef<HTMLVideoElement>(null);
+
+  const filterLabels: Record<Filter, string> = {
+    "All Videos": t.videos.categories.all,
+    "Temple Introduction": t.videos.categories.intro,
+    Highlights: t.videos.categories.highlights,
+    "Festivals & Events Activities": t.videos.categories.festivals,
+  };
 
   const visible = useMemo(
     () => (filter === "All Videos" ? videos : videos.filter((video) => video.category === filter)),
@@ -101,16 +110,15 @@ export function Videos({ videos = [] }: { videos?: TempleVideo[] }) {
   return (
     <Section id="videos" className="bg-gradient-to-b from-cream via-secondary/30 to-cream">
       <SectionHeading
-        eyebrow="Temple Videos"
-        title="Temple Video Gallery"
-        hindi="मंदिर वीडियो संग्रह"
+        eyebrow={t.videos.eyebrow}
+        title={t.videos.title}
+        hindi={t.videos.hindi}
       >
-        Watch the official temple introduction and all five uploaded highlights, with dedicated
-        space prepared for future festival and event activity updates.
+        {t.videos.subtitle}
       </SectionHeading>
 
       <div className="mt-10 flex flex-wrap justify-center gap-2">
-        {filters.map((item) => (
+        {filterKeys.map((item) => (
           <button
             key={item}
             type="button"
@@ -125,7 +133,7 @@ export function Videos({ videos = [] }: { videos?: TempleVideo[] }) {
             }`}
             aria-pressed={filter === item}
           >
-            {item}
+            {filterLabels[item]}
           </button>
         ))}
       </div>
@@ -206,7 +214,7 @@ export function Videos({ videos = [] }: { videos?: TempleVideo[] }) {
 
                 <div className="absolute bottom-0 left-0 right-0 p-5">
                   <div className="text-[10px] uppercase tracking-widest text-gold-soft">
-                    {video.category}
+                    {filterLabels[video.category as Filter] || video.category}
                   </div>
                   <div className="mt-0.5 font-display text-xl font-semibold leading-tight text-cream">
                     {video.title}
@@ -226,10 +234,10 @@ export function Videos({ videos = [] }: { videos?: TempleVideo[] }) {
           role="status"
         >
           <h3 className="font-display text-2xl font-semibold text-ink">
-            Festivals & Events Activities
+            {t.videos.emptyTitle}
           </h3>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            New festival and event videos will appear here as they are published.
+            {t.videos.emptyDesc}
           </p>
         </div>
       )}
@@ -254,7 +262,7 @@ export function Videos({ videos = [] }: { videos?: TempleVideo[] }) {
                 event.stopPropagation();
                 setOpenIdx(null);
               }}
-              aria-label="Close video"
+              aria-label={t.videos.closeAria}
               className="interactive-surface absolute right-3 top-3 z-20 grid h-11 w-11 place-items-center rounded-full bg-cream/15 text-cream backdrop-blur hover:bg-cream/25 sm:right-5 sm:top-5"
             >
               <X className="h-5 w-5" />
@@ -320,7 +328,7 @@ export function Videos({ videos = [] }: { videos?: TempleVideo[] }) {
                   className="absolute right-3 top-3 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-full bg-ink/60 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-cream backdrop-blur transition-colors duration-300 hover:bg-ink/80 focus-visible:ring-cream"
                   aria-label="Play video fullscreen"
                 >
-                  <Maximize2 className="h-3.5 w-3.5" /> Fullscreen
+                  <Maximize2 className="h-3.5 w-3.5" /> {t.videos.fullscreen}
                 </button>
               )}
             </motion.div>

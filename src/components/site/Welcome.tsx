@@ -3,9 +3,11 @@ import { AnimatePresence, motion } from "framer-motion";
 import { BookOpen, Play } from "lucide-react";
 import type { TempleVideo } from "@/lib/media";
 import { getInitialVideoAspectRatio, isPortraitRatio } from "@/lib/video-presentation";
+import { useLanguage } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
 export function Welcome({ introductionVideo }: { introductionVideo?: TempleVideo }) {
+  const { t } = useLanguage();
   const [playing, setPlaying] = useState(false);
   const [videoAspectRatio, setVideoAspectRatio] = useState(
     introductionVideo ? getInitialVideoAspectRatio(introductionVideo) : 16 / 9,
@@ -20,12 +22,11 @@ export function Welcome({ introductionVideo }: { introductionVideo?: TempleVideo
   return (
     <Section id="welcome" className="!pt-20 sm:!pt-28">
       <SectionHeading
-        eyebrow="स्वागतम्"
-        title="Welcome to Dariyapur Shiv Mandir"
-        hindi="हर हर महादेव"
+        eyebrow={t.welcome.eyebrow}
+        title={t.welcome.title}
+        hindi={t.welcome.hindi}
       >
-        A place of devotion, daily darshan and quiet reflection — where every visitor is greeted as
-        family and every prayer carries the blessings of Bhagwan Shiv.
+        {t.welcome.subtitle}
       </SectionHeading>
 
       <div className="mt-12 grid min-w-0 items-center gap-10 sm:mt-16 lg:grid-cols-2">
@@ -104,7 +105,7 @@ export function Welcome({ introductionVideo }: { introductionVideo?: TempleVideo
                 </span>
                 <span className="absolute inset-x-0 bottom-0 p-5 text-cream sm:p-6">
                   <span className="block text-[10px] font-semibold uppercase tracking-[0.2em] text-gold-soft">
-                    Featured
+                    {t.welcome.featuredVideo}
                   </span>
                   <span className="mt-1 block font-display text-2xl font-semibold">
                     {introductionVideo.title}
@@ -119,7 +120,7 @@ export function Welcome({ introductionVideo }: { introductionVideo?: TempleVideo
                 animate={{ opacity: 1 }}
                 className="grid h-full w-full place-items-center bg-ink p-6 text-center text-sm text-cream/70"
               >
-                Introduction video is not available right now.
+                {t.welcome.videoUnavailable}
               </motion.div>
             )}
           </AnimatePresence>
@@ -132,20 +133,17 @@ export function Welcome({ introductionVideo }: { introductionVideo?: TempleVideo
           transition={{ duration: 0.8, delay: 0.15 }}
         >
           <p className="font-display text-2xl leading-snug text-ink sm:text-3xl">
-            “Where centuries of devotion meet a living, breathing community of faith.”
+            {t.welcome.quote}
           </p>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-            For generations the Dariyapur Shiv Mandir has been a quiet anchor for the people of
-            Kanti — a place to bow your head, light a diya, and feel a stillness that the world
-            outside rarely offers. Whether you arrive for daily darshan, a special festival, or
-            simply to walk through the temple garden, you are welcome here.
+            {t.welcome.story}
           </p>
 
           <div className="mt-7 grid grid-cols-3 gap-2 sm:gap-3">
             {[
-              { k: <CountUp value={60} suffix="+" />, v: "Years of Seva" },
-              { k: <CountUp value={365} />, v: "Days of Darshan" },
-              { k: "∞", v: "Blessings Given" },
+              { k: <CountUp value={60} suffix="+" />, v: t.welcome.yearsOfSeva },
+              { k: <CountUp value={365} />, v: t.welcome.daysOfDarshan },
+              { k: "∞", v: t.welcome.blessingsGiven },
             ].map((s) => (
               <div
                 key={s.v}
@@ -166,7 +164,7 @@ export function Welcome({ introductionVideo }: { introductionVideo?: TempleVideo
             className="interactive-surface mt-8 inline-flex min-h-11 items-center justify-center gap-2 rounded-full gradient-saffron px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sacred"
           >
             <BookOpen className="h-4 w-4" />
-            Read About Temple
+            {t.welcome.readAboutBtn}
           </a>
         </motion.div>
       </div>

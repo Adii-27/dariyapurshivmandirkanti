@@ -16,27 +16,28 @@ import { NotificationInvite } from "@/components/site/NotificationInvite";
 import { PwaInstallPrompt } from "@/components/site/PwaInstallPrompt";
 import { Toaster } from "@/components/ui/sonner";
 import { getGoogleAnalyticsHeadScripts, trackGoogleAnalyticsPageView } from "@/lib/analytics";
-import { LanguageProvider } from "@/lib/i18n";
+import { LanguageProvider, useLanguage } from "@/lib/i18n";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
+  const { t } = useLanguage();
+
   return (
     <div className="flex min-h-dvh items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-gradient-saffron">404</h1>
-        <h2 lang="hi" className="mt-4 text-xl font-semibold text-foreground">
-          पृष्ठ नहीं मिला
+        <h2 className="mt-4 text-xl font-semibold text-foreground">
+          {t.notFound.title}
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
+          {t.notFound.description}
         </p>
         <div className="mt-6">
           <Link
             to="/"
-            lang="hi"
             className="inline-flex items-center justify-center rounded-md gradient-saffron px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sacred"
           >
-            मंदिर वापस जाएं
+            {t.notFound.backHome}
           </Link>
         </div>
       </div>

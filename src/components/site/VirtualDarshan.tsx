@@ -7,6 +7,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { useLanguage } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
 const STREET_VIEW_URL = "https://maps.app.goo.gl/vGTVsEXAFpj2MoNJ6";
@@ -14,6 +15,7 @@ const STREET_VIEW_EMBED =
   "https://www.google.com/maps/embed?pb=!4v1781246400000!6m8!1m7!1sLlVHTk5CHQ3BMBso2Fd39Q!2m2!1d26.1581116!2d85.3053131!3f254.31!4f0!5f0.7820865974627469";
 
 export function VirtualDarshan() {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const transitionTimerRef = useRef<number | null>(null);
@@ -63,30 +65,29 @@ export function VirtualDarshan() {
   return (
     <Section id="darshan">
       <SectionHeading
-        eyebrow="Virtual Darshan"
-        title="Step Inside, Anywhere in the World"
-        hindi="आभासी दर्शन"
+        eyebrow={t.virtualDarshan.eyebrow}
+        title={t.virtualDarshan.title}
+        hindi={t.virtualDarshan.hindi}
       >
-        Open the interactive Street View to look around the temple entrance and grounds from your
-        phone, tablet or desktop.
+        {t.virtualDarshan.subtitle}
       </SectionHeading>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-3">
         {[
           {
-            t: "360° View",
-            d: "Pan around the temple in full panoramic detail.",
-            k: "Drag to rotate",
+            t: t.virtualDarshan.card1Title,
+            d: t.virtualDarshan.card1Desc,
+            k: t.virtualDarshan.card1Key,
           },
           {
-            t: "Zoom & Explore",
-            d: "Look closer at the shikhara, garden and entrance.",
-            k: "Scroll to zoom",
+            t: t.virtualDarshan.card2Title,
+            d: t.virtualDarshan.card2Desc,
+            k: t.virtualDarshan.card2Key,
           },
           {
-            t: "Anywhere, Anytime",
-            d: "Take darshan from your phone, tablet or desktop.",
-            k: "Fully responsive",
+            t: t.virtualDarshan.card3Title,
+            d: t.virtualDarshan.card3Desc,
+            k: t.virtualDarshan.card3Key,
           },
         ].map((card) => (
           <div
@@ -110,10 +111,10 @@ export function VirtualDarshan() {
           className="inline-flex min-h-12 items-center gap-2 rounded-full gradient-saffron px-8 py-4 text-base font-semibold text-primary-foreground shadow-sacred transition-opacity duration-300 disabled:opacity-85"
         >
           <Sparkles className="h-5 w-5" />
-          {isTransitioning ? "Opening Virtual Darshan…" : "View Virtual Darshan"}
+          {isTransitioning ? t.virtualDarshan.openingBtn : t.virtualDarshan.viewBtn}
         </motion.button>
         <p className="mt-3 text-xs text-muted-foreground">
-          Opens a responsive interactive temple view.
+          {t.virtualDarshan.responsiveNote}
         </p>
       </div>
 
@@ -172,14 +173,17 @@ export function VirtualDarshan() {
               <div className="relative mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-saffron/20 to-gold/30 ring-1 ring-gold/40 shadow-glow">
                 <Sparkles className="h-8 w-8 text-gold-soft animate-pulse" />
               </div>
-              <div className="font-hindi text-xl font-medium tracking-wide text-gold-soft sm:text-2xl">
-                ॐ नमः शिवाय
+              <div
+                lang="sa"
+                className="font-hindi text-xl font-medium tracking-wide text-gold-soft sm:text-2xl"
+              >
+                {t.hero.chant}
               </div>
               <div className="mt-2 font-display text-sm font-semibold tracking-widest uppercase text-cream/90 sm:text-base">
-                Entering Virtual Darshan
+                {t.virtualDarshan.enteringTitle}
               </div>
               <div className="mt-1 font-hindi text-xs tracking-wider text-gold-soft/70">
-                दरियापुर शिव मंदिर काँटी
+                {t.virtualDarshan.enteringSubtitle}
               </div>
             </motion.div>
           </motion.div>
@@ -199,12 +203,12 @@ export function VirtualDarshan() {
                 rel="noreferrer"
                 className="inline-flex min-h-11 min-w-0 items-center gap-2 rounded-md font-display text-base font-semibold text-cream transition-colors duration-300 hover:text-gold-soft sm:text-lg"
               >
-                <span className="truncate">Interactive Temple View</span>
+                <span className="truncate">{t.virtualDarshan.dialogTitle}</span>
                 <ExternalLink className="h-4 w-4 shrink-0" />
               </a>
             </DialogTitle>
             <span className="hidden text-[10px] font-semibold uppercase tracking-widest text-cream/55 sm:block">
-              Drag to look around
+              {t.virtualDarshan.dragToLook}
             </span>
           </div>
           <motion.div
@@ -215,7 +219,7 @@ export function VirtualDarshan() {
           >
             <iframe
               src={STREET_VIEW_EMBED}
-              title="Interactive Temple View"
+              title={t.virtualDarshan.dialogTitle}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               allowFullScreen
@@ -232,7 +236,7 @@ export function VirtualDarshan() {
           rel="noreferrer"
           className="interactive-surface inline-flex min-h-11 items-center gap-1.5 rounded-md text-xs font-semibold uppercase tracking-widest text-saffron-deep hover:text-ember"
         >
-          Open Street View in Google Maps
+          {t.virtualDarshan.openMapsLink}
           <ExternalLink className="h-3 w-3" />
         </a>
       </div>

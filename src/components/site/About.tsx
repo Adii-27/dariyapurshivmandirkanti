@@ -3,29 +3,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Landmark, MapPin, Clock, HeartHandshake } from "lucide-react";
 import { Section } from "./Section";
 import { ABOUT_SLIDES, TEMPLE_LOGO } from "@/lib/media";
+import { useLanguage } from "@/lib/i18n";
 
 const slides = ABOUT_SLIDES;
 
-const paragraphs = [
-  "Dariyapur Shiv Mandir Kanti is one of the important spiritual and religious places of the region, regarded as a sacred centre of Lord Shiva devotion, faith, and spiritual peace.",
-  "For years, the temple has remained a place of deep devotion for devotees. Daily worship, darshan, and religious rituals are performed here, and visitors come to seek Lord Shiva's blessings and experience inner peace.",
-  "During Maha Shivratri, the month of Shravan, and other religious festivals, the temple premises become filled with devotion, energy, and community participation. Large numbers of devotees visit for darshan and worship on these special occasions.",
-  "The support of the local community, the spirit of service, and the faith of devotees have established the temple not only as a religious place, but also as a symbol of social harmony, cultural heritage, and community unity.",
-  "The temple's purpose is not limited to worship alone. It also encourages service, compassion, harmony, and human values in society.",
-];
-
-const infoCards = [
-  { icon: Landmark, label: "Temple Name", value: "Dariyapur Shiv Mandir Kanti" },
-  { icon: MapPin, label: "Location", value: "Dariyapur, Kanti, Muzaffarpur" },
-  { icon: Clock, label: "Darshan Timings", value: "7:00 AM – 8:00 PM" },
-  { icon: HeartHandshake, label: "Core Value", value: "Faith, service, and harmony" },
-];
-
 export function About() {
+  const { t } = useLanguage();
   const [idx, setIdx] = useState(0);
   const [paused, setPaused] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const slideshowRef = useRef<HTMLDivElement>(null);
+
+  const paragraphs = [t.about.p1, t.about.p2, t.about.p3, t.about.p4, t.about.p5];
+
+  const infoCards = [
+    { icon: Landmark, label: t.about.templeNameLabel, value: t.about.templeNameValue },
+    { icon: MapPin, label: t.about.locationLabel, value: t.about.locationValue },
+    { icon: Clock, label: t.about.timingsLabel, value: t.about.timingsValue },
+    { icon: HeartHandshake, label: t.about.coreValueLabel, value: t.about.coreValueValue },
+  ];
 
   useEffect(() => {
     const el = slideshowRef.current;
@@ -55,7 +51,7 @@ export function About() {
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-gold/50 bg-cream/70 px-4 py-2 shadow-sm backdrop-blur">
             <span className="text-saffron-deep">✦</span>
             <span className="text-xs font-semibold uppercase tracking-[0.22em] text-saffron-deep">
-              About the Temple
+              {t.about.eyebrow}
             </span>
           </div>
 
@@ -66,7 +62,7 @@ export function About() {
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className="font-display text-4xl font-bold leading-[1.05] text-ink sm:text-5xl lg:text-6xl"
           >
-            Dariyapur Shiv Mandir Kanti
+            {t.about.title}
           </motion.h2>
 
           <div className="mt-6 flex items-center gap-2" aria-hidden>
@@ -90,7 +86,7 @@ export function About() {
           </div>
 
           <blockquote className="mt-8 rounded-r-xl border-l-4 border-saffron-deep bg-gold-soft/40 px-6 py-5 font-display text-xl font-semibold italic text-saffron-deep sm:text-2xl">
-            “Service to humanity is service to God.”
+            {t.about.quote}
           </blockquote>
         </div>
 
@@ -138,10 +134,10 @@ export function About() {
               </div>
               <div className="min-w-0">
                 <div className="font-display text-base font-bold leading-tight text-cream sm:text-2xl">
-                  Dariyapur Shiv Mandir Kanti
+                  {t.about.templeNameValue}
                 </div>
                 <div className="mt-1 text-[9px] font-semibold uppercase tracking-wider text-gold sm:text-xs sm:tracking-widest">
-                  Official Temple Website
+                  {t.about.officialWebsite}
                 </div>
               </div>
             </div>

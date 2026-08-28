@@ -37,6 +37,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
       if (saved === "en" || saved === "hi") {
         setLanguageState(saved);
+        if (typeof document !== "undefined") {
+          document.documentElement.lang = saved;
+        }
       }
     } catch {
       // Storage unavailable or blocked; default to "en"
@@ -45,6 +48,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
+    if (typeof document !== "undefined") {
+      document.documentElement.lang = lang;
+    }
     try {
       window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
     } catch {

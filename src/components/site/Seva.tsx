@@ -1,54 +1,57 @@
 import { motion } from "framer-motion";
 import { HandHeart, BookOpenText, Bird, Users, Sparkles, Heart } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
-const sevas = [
-  {
-    icon: HandHeart,
-    hi: "ज़रूरतमंदों की सहायता",
-    en: "Help the Needy",
-    desc: "Reach out to those in need with food, clothing and care.",
-  },
-  {
-    icon: BookOpenText,
-    hi: "शिक्षा का समर्थन",
-    en: "Support Education",
-    desc: "Empower young minds — a book given is a future shaped.",
-  },
-  {
-    icon: Bird,
-    hi: "पशु-पक्षियों की सेवा",
-    en: "Feed Animals & Birds",
-    desc: "Compassion to every living being is worship in motion.",
-  },
-  {
-    icon: Users,
-    hi: "बुज़ुर्गों का सम्मान",
-    en: "Respect Your Elders",
-    desc: "Their blessings are the foundation of every household.",
-  },
-  {
-    icon: Sparkles,
-    hi: "स्वच्छता बनाए रखें",
-    en: "Maintain Cleanliness",
-    desc: "A clean temple and clean surroundings honour the divine.",
-  },
-  {
-    icon: Heart,
-    hi: "सद्भाव और दया",
-    en: "Harmony & Kindness",
-    desc: "Let kindness be the language of every interaction.",
-  },
-];
-
 export function Seva() {
+  const { t } = useLanguage();
+
+  const sevas = [
+    {
+      icon: HandHeart,
+      title: t.seva.cards.needyTitle,
+      hindi: t.seva.cards.needyHindi,
+      desc: t.seva.cards.needyDesc,
+    },
+    {
+      icon: BookOpenText,
+      title: t.seva.cards.educationTitle,
+      hindi: t.seva.cards.educationHindi,
+      desc: t.seva.cards.educationDesc,
+    },
+    {
+      icon: Bird,
+      title: t.seva.cards.animalsTitle,
+      hindi: t.seva.cards.animalsHindi,
+      desc: t.seva.cards.animalsDesc,
+    },
+    {
+      icon: Users,
+      title: t.seva.cards.eldersTitle,
+      hindi: t.seva.cards.eldersHindi,
+      desc: t.seva.cards.eldersDesc,
+    },
+    {
+      icon: Sparkles,
+      title: t.seva.cards.cleanlinessTitle,
+      hindi: t.seva.cards.cleanlinessHindi,
+      desc: t.seva.cards.cleanlinessDesc,
+    },
+    {
+      icon: Heart,
+      title: t.seva.cards.harmonyTitle,
+      hindi: t.seva.cards.harmonyHindi,
+      desc: t.seva.cards.harmonyDesc,
+    },
+  ];
+
   return (
     <Section id="seva" className="relative overflow-hidden">
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-cream via-gold-soft/30 to-cream" />
       <SectionHeading
-        eyebrow="Seva Evam Prerna"
-        title="Acts of Service, Acts of Faith"
-        hindi="सेवा एवं प्रेरणा"
+        eyebrow={t.seva.eyebrow}
+        title={t.seva.title}
+        hindi={t.seva.hindi}
       />
 
       <motion.blockquote
@@ -58,13 +61,13 @@ export function Seva() {
         transition={{ duration: 0.7 }}
         className="font-hindi mx-auto mt-8 max-w-2xl text-center text-2xl leading-snug text-gradient-saffron sm:text-3xl"
       >
-        “दूसरों की सहायता करना सबसे बड़ा पुण्य है।”
+        {t.seva.quote}
       </motion.blockquote>
 
       <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {sevas.map((s, i) => (
           <motion.div
-            key={s.en}
+            key={i}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
@@ -75,8 +78,8 @@ export function Seva() {
             <div className="relative grid h-14 w-14 place-items-center rounded-2xl gradient-saffron text-cream shadow-sacred">
               <s.icon className="h-6 w-6" />
             </div>
-            <h4 className="relative mt-5 font-display text-xl font-semibold text-ink">{s.en}</h4>
-            <p className="font-hindi relative mt-1 text-base text-saffron-deep">{s.hi}</p>
+            <h4 className="relative mt-5 font-display text-xl font-semibold text-ink">{s.title}</h4>
+            <p className="font-hindi relative mt-1 text-base text-saffron-deep">{s.hindi}</p>
             <p className="relative mt-3 text-sm leading-relaxed text-muted-foreground">{s.desc}</p>
           </motion.div>
         ))}

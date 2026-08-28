@@ -7,11 +7,12 @@ import {
   type TemplePhoto,
   TEMPLE_PHOTOS,
 } from "@/lib/media";
+import { useLanguage } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
 type Filter = "All" | GalleryCategory;
 
-const categories: Filter[] = [
+const categoryKeys: Filter[] = [
   "All",
   "Day",
   "Evening",
@@ -22,11 +23,22 @@ const categories: Filter[] = [
 ];
 
 export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) {
+  const { t } = useLanguage();
   const [filter, setFilter] = useState<Filter>("All");
   const [expanded, setExpanded] = useState(false);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  const categoryLabels: Record<Filter, string> = {
+    All: t.gallery.categories.all,
+    Day: t.gallery.categories.day,
+    Evening: t.gallery.categories.evening,
+    Night: t.gallery.categories.night,
+    Exterior: t.gallery.categories.exterior,
+    Interior: t.gallery.categories.interior,
+    Festivals: t.gallery.categories.festivals,
+  };
 
   const preview = useMemo(
     () => (photos === TEMPLE_PHOTOS ? GALLERY_PREVIEW : photos.slice(0, 8)),
@@ -108,16 +120,15 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
   return (
     <Section id="gallery" className="bg-secondary/40">
       <SectionHeading
-        eyebrow="Temple Gallery"
-        title="Moments of Devotion"
-        hindi="मंदिर दर्शन वीथिका"
+        eyebrow={t.gallery.eyebrow}
+        title={t.gallery.title}
+        hindi={t.gallery.hindi}
       >
-        A preview of authentic temple photographs, with the complete day, evening, night, exterior,
-        interior and festival collection available below.
+        {t.gallery.subtitle}
       </SectionHeading>
 
       <div className="mt-10 flex flex-wrap justify-center gap-2">
-        {categories.map((category) => (
+        {categoryKeys.map((category) => (
           <button
             key={category}
             type="button"
@@ -132,7 +143,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
             }`}
             aria-pressed={filter === category}
           >
-            {category}
+            {categoryLabels[category]}
           </button>
         ))}
       </div>
@@ -164,7 +175,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
             <div className="touch-overlay absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100" />
             <div className="touch-caption absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 transition-[transform,opacity] duration-300 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100">
               <div className="text-[10px] uppercase tracking-widest text-gold-soft">
-                {photo.categories.join(" · ")}
+                {photo.categories.map((cat) => categoryLabels[cat] || cat).join(" · ")}
               </div>
               <div className="mt-0.5 text-sm font-medium text-cream">{photo.caption}</div>
               <div className="font-hindi text-xs text-cream/80">{photo.hindi}</div>
@@ -181,7 +192,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
             className="interactive-surface inline-flex min-h-11 items-center gap-2 rounded-full gradient-saffron px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sacred"
           >
             <Images className="h-4 w-4" />
-            {expanded ? "Show Gallery Preview" : "View Complete Gallery"}
+            {expanded ? t.gallery.showPreviewBtn : t.gallery.viewCompleteBtn}
           </button>
         </div>
       )}
@@ -207,7 +218,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
                 event.stopPropagation();
                 setOpenIdx(null);
               }}
-              aria-label="Close gallery"
+              aria-label={t.gallery.closeAria}
               className="interactive-surface absolute right-3 top-3 z-20 grid h-11 w-11 place-items-center rounded-full bg-cream/15 text-cream backdrop-blur hover:bg-cream/25 sm:right-5 sm:top-5"
             >
               <X className="h-5 w-5" />
@@ -218,7 +229,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
                 event.stopPropagation();
                 prev();
               }}
-              aria-label="Previous photo"
+              aria-label={t.gallery.prevAria}
               className="absolute left-2 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/60 text-cream backdrop-blur transition-colors duration-300 hover:bg-ink/75 sm:left-5"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -229,7 +240,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
                 event.stopPropagation();
                 next();
               }}
-              aria-label="Next photo"
+              aria-label={t.gallery.nextAria}
               className="absolute right-2 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-ink/60 text-cream backdrop-blur transition-colors duration-300 hover:bg-ink/75 sm:right-5"
             >
               <ChevronRight className="h-5 w-5" />
@@ -254,7 +265,10 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-ink to-transparent p-5 text-cream">
                 <div className="text-[10px] uppercase tracking-widest text-gold-soft">
-                  {visible[openIdx].categories.join(" · ")} · {openIdx + 1} / {visible.length}
+                  {visible[openIdx].categories
+                    .map((cat) => categoryLabels[cat] || cat)
+                    .join(" · ")}{" "}
+                  · {openIdx + 1} / {visible.length}
                 </div>
                 <p className="mt-1 font-display text-lg">{visible[openIdx].caption}</p>
                 <p className="font-hindi text-sm text-cream/80">{visible[openIdx].hindi}</p>

@@ -5,6 +5,7 @@ import {
   WIKIMEDIA_CONTRIBUTIONS_URL,
   type WikimediaFile,
 } from "@/lib/wikimedia/commons";
+import { useLanguage } from "@/lib/i18n";
 import { WikimediaGallery } from "./WikimediaGallery";
 import {
   WikimediaEmpty,
@@ -23,6 +24,8 @@ export function WikimediaSection({
   isError: boolean;
   refetch: () => void;
 }) {
+  const { t } = useLanguage();
+
   return (
     <Section id="wikimedia-collection" className="bg-background">
       {/* Wikimedia Commons Section Header */}
@@ -37,7 +40,7 @@ export function WikimediaSection({
             />
             <div className="text-left leading-tight">
               <span className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                Media Repository
+                {t.heritage.mediaRepoLabel}
               </span>
               <span className="font-display text-sm font-semibold text-ink">
                 Wikimedia Commons
@@ -53,16 +56,15 @@ export function WikimediaSection({
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="mt-6 font-display text-3xl font-semibold leading-[1.08] text-ink sm:text-4xl lg:text-5xl"
         >
-          Dariyapur Shiv Mandir Kanti
+          {t.location.templeName}
         </motion.h2>
 
         <p className="font-hindi mt-2 text-lg text-saffron-deep sm:text-xl">
-          विकीमीडिया कॉमन्स — स्वतंत्र ज्ञान एवं सांस्कृतिक संरक्षण
+          {t.heritage.wikimediaHindi}
         </p>
 
         <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Explore photographs of the temple and its surroundings, documented and shared for free
-          knowledge and cultural preservation.
+          {t.heritage.wikimediaSubtitle}
         </p>
 
         {/* Primary CTA */}
@@ -75,7 +77,7 @@ export function WikimediaSection({
             className="interactive-surface inline-flex min-h-11 items-center gap-2 rounded-full gradient-saffron px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sacred hover:shadow-glow focus-visible:ring-gold"
           >
             <Globe className="h-4 w-4" />
-            Explore on Wikimedia Commons
+            {t.heritage.exploreCommonsBtn}
             <ExternalLink className="h-4 w-4" />
           </a>
         </div>
@@ -89,11 +91,10 @@ export function WikimediaSection({
           </div>
           <div className="min-w-0">
             <span className="block font-display text-xs font-bold uppercase tracking-wider text-saffron-deep">
-              SHARED FOR FREE KNOWLEDGE
+              {t.heritage.sharedFreeKnowledgeBadge}
             </span>
             <p className="mt-0.5 text-xs text-ink/80 sm:text-sm">
-              These photographs are shared through Wikimedia Commons to help document and preserve the
-              visual heritage of Dariyapur Shiv Mandir Kanti.
+              {t.heritage.sharedFreeKnowledgeDesc}
             </p>
           </div>
         </div>
@@ -117,7 +118,7 @@ export function WikimediaSection({
         <div className="mt-12 text-center">
           <div className="inline-flex flex-col sm:flex-row items-center gap-3 rounded-2xl border border-border/80 bg-card/60 p-4 shadow-sm backdrop-blur">
             <span className="text-xs text-muted-foreground">
-              Showing {files.length} authentic photographs documented on Wikimedia Commons
+              {t.heritage.showingCount.replace("{count}", String(files.length))}
             </span>
             <a
               href={WIKIMEDIA_CONTRIBUTIONS_URL}
@@ -125,7 +126,7 @@ export function WikimediaSection({
               rel="noopener noreferrer"
               className="interactive-surface inline-flex min-h-11 items-center gap-1.5 rounded-full border border-gold/60 bg-gold-soft/50 px-4 py-2 text-xs font-semibold text-saffron-deep hover:bg-gold-soft"
             >
-              Explore Contributor Archive
+              {t.heritage.exploreContributorArchive}
               <ExternalLink className="h-3.5 w-3.5" />
             </a>
           </div>

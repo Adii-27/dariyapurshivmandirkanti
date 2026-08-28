@@ -1,42 +1,45 @@
 import { motion } from "framer-motion";
 import { Calendar, Clock, Landmark, MapPin, Sparkles } from "lucide-react";
 import { Section } from "@/components/site/Section";
-
-const facts = [
-  {
-    icon: Calendar,
-    label: "ESTABLISHED",
-    value: "1962",
-    detail: "Serving devotees for over six decades",
-  },
-  {
-    icon: MapPin,
-    label: "LOCATION",
-    value: "Dariyapur, Kanti, Muzaffarpur, Bihar, India",
-    detail: "Near Paswan Chowk, PIN 843113",
-  },
-  {
-    icon: Landmark,
-    label: "DEDICATED TO",
-    value: "Lord Shiva",
-    detail: "Sacred centre of worship & inner peace",
-  },
-  {
-    icon: Clock,
-    label: "TEMPLE HOURS",
-    value: "7:00 AM – 8:00 PM",
-    detail: "Open daily for darshan & prayers",
-  },
-];
+import { useLanguage } from "@/lib/i18n";
 
 export function TempleFacts() {
+  const { t } = useLanguage();
+
+  const facts = [
+    {
+      icon: Calendar,
+      label: t.heritage.estLabel.toUpperCase(),
+      value: t.heritage.estValue,
+      detail: t.heritage.factEstDetail,
+    },
+    {
+      icon: MapPin,
+      label: t.heritage.locationLabel.toUpperCase(),
+      value: t.contact.addressValue,
+      detail: t.heritage.factLocDetail,
+    },
+    {
+      icon: Landmark,
+      label: t.heritage.dedicationLabel.toUpperCase(),
+      value: t.heritage.dedicationValue,
+      detail: t.heritage.factDedDetail,
+    },
+    {
+      icon: Clock,
+      label: t.about.timingsLabel.toUpperCase(),
+      value: t.about.timingsValue,
+      detail: t.heritage.factHoursDetail,
+    },
+  ];
+
   return (
     <Section id="about-temple" className="bg-secondary/30">
       <div className="mx-auto max-w-3xl text-center">
         <div className="mb-4 inline-flex items-center gap-2">
           <span className="h-px w-6 bg-saffron-deep/60" />
           <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-saffron-deep sm:text-xs">
-            TEMPLE IDENTITY
+            {t.heritage.identityEyebrow}
           </span>
           <span className="h-px w-6 bg-saffron-deep/60" />
         </div>
@@ -48,11 +51,11 @@ export function TempleFacts() {
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="font-display text-3xl font-semibold leading-tight text-ink sm:text-4xl lg:text-5xl"
         >
-          About the Temple
+          {t.heritage.identityTitle}
         </motion.h2>
 
         <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-          Verified historical and spiritual identity of Dariyapur Shiv Mandir Kanti.
+          {t.heritage.identitySubtitle}
         </p>
       </div>
 
@@ -105,10 +108,10 @@ export function TempleFacts() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="text-[11px] font-bold uppercase tracking-wider text-saffron-deep">
-              Sanctuary of Devotion &amp; Heritage
+              {t.heritage.narrativeBadge}
             </div>
             <p className="mt-3 text-base leading-[1.85] text-ink/90 sm:text-lg sm:leading-relaxed">
-              Established in 1962, Dariyapur Shiv Mandir Kanti is a revered sanctuary of peace and devotion in Muzaffarpur, Bihar. This beautiful Hindu temple, dedicated to Lord Shiva, serves as a pillar of faith for the community. Devotees are welcomed to participate in daily prayers and religious ceremonies, experiencing the spiritual tranquility the temple provides. A vibrant hub of activity during Mahashivratri and the Shravan month, it is a place for all to gather and seek blessings. The temple stands as a powerful symbol of devotion and cultural heritage, enriching lives for over six decades.
+              {t.heritage.narrativeText}
             </p>
           </div>
         </div>

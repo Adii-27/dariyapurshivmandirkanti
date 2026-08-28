@@ -9,6 +9,7 @@ import {
   NOTIFICATION_STATE_CHANGED_EVENT,
   PROMPT_OPEN_EVENT,
 } from "@/lib/push";
+import { useLanguage } from "@/lib/i18n";
 
 const NOTIFICATION_HANDLED_KEY = "temple-notification-onboarding-handled";
 const NOTIFICATION_DELAY_MS = 12_000; // Exactly 12 seconds for new visitors
@@ -30,6 +31,7 @@ function markNotificationHandled() {
 }
 
 export function NotificationInvite() {
+  const { t } = useLanguage();
   const [visible, setVisible] = useState(false);
   const [working, setWorking] = useState(false);
 
@@ -114,9 +116,9 @@ export function NotificationInvite() {
       markNotificationHandled();
       dispatchNotificationStateChange(true);
       setVisible(false);
-      toast.success("🕉️ You're now connected");
+      toast.success(t.notifications.connectedToast);
     } catch {
-      toast.error("Notifications could not be enabled. Please try again later.");
+      toast.error(t.notifications.errorToast);
     } finally {
       setWorking(false);
     }
@@ -147,10 +149,10 @@ export function NotificationInvite() {
             </div>
             <div>
               <h2 className="font-display text-lg font-bold text-ink">
-                🔔 Stay Connected With the Mandir
+                {t.notifications.inviteTitle}
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                Receive festival reminders, important temple notices and new temple updates.
+                {t.notifications.inviteDesc}
               </p>
             </div>
           </div>
@@ -161,7 +163,7 @@ export function NotificationInvite() {
               disabled={working}
               className="interactive-surface inline-flex min-h-10 items-center justify-center gap-2 rounded-xl gradient-saffron px-4 text-sm font-semibold text-primary-foreground shadow-sacred disabled:opacity-60"
             >
-              {working ? "Connecting..." : "Enable Notifications"}
+              {working ? t.notifications.connectingBtn : t.notifications.enableBtn}
               {!working && <Check className="h-4 w-4" />}
             </button>
             <button
@@ -170,7 +172,7 @@ export function NotificationInvite() {
               disabled={working}
               className="interactive-surface min-h-10 rounded-xl border border-border bg-cream px-4 text-sm font-semibold text-ink hover:bg-secondary disabled:opacity-60"
             >
-              Maybe Later
+              {t.notifications.maybeLaterBtn}
             </button>
           </div>
         </motion.aside>

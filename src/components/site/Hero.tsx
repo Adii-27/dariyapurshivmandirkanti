@@ -1,9 +1,12 @@
 import { motion } from "framer-motion";
-import { Images, MapPin, Eye } from "lucide-react";
+import { Eye, Images, MapPin } from "lucide-react";
 import { HERO_IMAGE } from "@/lib/media";
+import { useLanguage } from "@/lib/i18n";
 import { StatusCard } from "./StatusCard";
 
 export function Hero() {
+  const { t, language } = useLanguage();
+
   return (
     <section id="home" className="relative isolate overflow-hidden pt-24">
       {/* Background banner */}
@@ -29,21 +32,31 @@ export function Hero() {
         >
           <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-gold/40 bg-ink/30 px-4 py-1.5 backdrop-blur-md">
             <span className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse-glow" />
-            <span className="min-w-0 break-words text-[11px] font-medium uppercase tracking-[0.16em] text-gold-soft sm:text-xs sm:tracking-[0.2em]">
-              ॐ नमः शिवाय
+            <span
+              lang="sa"
+              className="min-w-0 break-words text-[11px] font-medium uppercase tracking-[0.16em] text-gold-soft sm:text-xs sm:tracking-[0.2em]"
+            >
+              {t.hero.chant}
             </span>
           </div>
 
           <h1 className="mt-6 break-words font-display text-[clamp(2.75rem,14vw,4.5rem)] font-semibold leading-[1.02] sm:text-6xl lg:text-7xl">
-            Dariyapur <span className="text-gradient-gold">Shiv Mandir</span> Kanti
+            {language === "hi" ? (
+              <>
+                दरियापुर <span className="text-gradient-gold">शिव मंदिर</span> काँटी
+              </>
+            ) : (
+              <>
+                Dariyapur <span className="text-gradient-gold">Shiv Mandir</span> Kanti
+              </>
+            )}
           </h1>
           <p className="font-hindi mt-3 text-2xl font-medium text-gold-soft sm:text-3xl">
-            दरियापुर शिव मंदिर काँटी
+            {t.hero.titleHindi}
           </p>
 
           <p className="mt-7 max-w-xl text-base leading-relaxed text-cream/85 sm:text-lg">
-            A sacred centre of Lord Shiva — where faith, devotion and centuries of community
-            tradition meet. Step into a space of inner peace, ritual and timeless heritage.
+            {t.hero.description}
           </p>
 
           <div className="mt-9 flex flex-col items-stretch gap-3 min-[430px]:flex-row min-[430px]:flex-wrap min-[430px]:items-center">
@@ -54,7 +67,7 @@ export function Hero() {
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full gradient-saffron px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-sacred transition-shadow duration-300 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink"
             >
               <Eye className="h-4 w-4" />
-              Virtual Darshan
+              {t.hero.virtualDarshanBtn}
             </motion.a>
             <motion.a
               href="#gallery"
@@ -63,7 +76,7 @@ export function Hero() {
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-7 py-3.5 text-sm font-semibold text-cream shadow-sm backdrop-blur-md transition-[background-color,box-shadow] duration-300 hover:bg-ink/50 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink"
             >
               <Images className="h-4 w-4" />
-              Temple Gallery
+              {t.hero.galleryBtn}
             </motion.a>
             <motion.a
               href="https://maps.app.goo.gl/AwKW2occqHKrJVA9A"
@@ -74,21 +87,23 @@ export function Hero() {
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-7 py-3.5 text-sm font-semibold text-cream shadow-sm backdrop-blur-md transition-[background-color,box-shadow] duration-300 hover:bg-ink/50 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink"
             >
               <MapPin className="h-4 w-4" />
-              Get Directions
+              {t.hero.directionsBtn}
             </motion.a>
           </div>
 
           <div className="mt-10 flex items-center gap-6 text-xs uppercase tracking-[0.18em] text-cream/70">
             <div>
-              <div className="text-[10px]">Daily</div>
+              <div className="text-[10px]">{t.hero.daily}</div>
               <div className="text-sm normal-case tracking-normal text-gold-soft">
-                7:00 AM – 8:00 PM
+                {t.hero.hours}
               </div>
             </div>
             <div className="h-8 w-px bg-cream/30" />
             <div>
-              <div className="text-[10px]">Est.</div>
-              <div className="text-sm normal-case tracking-normal text-gold-soft">1962</div>
+              <div className="text-[10px]">{t.hero.established}</div>
+              <div className="text-sm normal-case tracking-normal text-gold-soft">
+                {t.hero.estYear}
+              </div>
             </div>
           </div>
         </motion.div>

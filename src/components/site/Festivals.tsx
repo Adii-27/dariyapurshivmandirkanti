@@ -2,10 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Calendar, ChevronLeft, ChevronRight, Sparkles, X } from "lucide-react";
 import type { FestivalUpdate } from "@/lib/updates";
+import { useLanguage } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
 const INDIA_TIME_ZONE = "Asia/Kolkata";
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function useCountdown(target?: Date) {
   const [now, setNow] = useState<number | null>(null);
@@ -31,7 +31,7 @@ function useCountdown(target?: Date) {
   };
 }
 
-function formatFestivalDate(value: string) {
+function formatFestivalDate(value: string, locale = "en-IN") {
   const date = new Date(value);
   const indiaTime = new Intl.DateTimeFormat("en-GB", {
     hour: "2-digit",
@@ -41,7 +41,7 @@ function formatFestivalDate(value: string) {
   }).format(date);
   const hasMeaningfulTime = indiaTime !== "00:00" && indiaTime !== "24:00";
 
-  return date.toLocaleString("en-IN", {
+  return date.toLocaleString(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -66,16 +66,29 @@ function calendarDateKey(year: number, month: number, day: number) {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
-function FestivalDateRange({ festival }: { festival: FestivalUpdate }) {
+function FestivalDateRange({
+  festival,
+  locale,
+}: {
+  festival: FestivalUpdate;
+  locale: string;
+}) {
   return (
     <>
-      {formatFestivalDate(festival.date)}
-      {festival.endDate && <> - {formatFestivalDate(festival.endDate)}</>}
+      {formatFestivalDate(festival.date, locale)}
+      {festival.endDate && <> - {formatFestivalDate(festival.endDate, locale)}</>}
     </>
   );
 }
 
-function Countdown({ festival, compact = false }: { festival: FestivalUpdate; compact?: boolean }) {
+function Countdown({
+  festival,
+  compact = false,
+}: {
+  festival: FestivalUpdate;
+  compact?: boolean;
+}) {
+  const { t } = useLanguage();
   const countdown = useCountdown(new Date(festival.date));
 
   return (
@@ -84,10 +97,10 @@ function Countdown({ festival, compact = false }: { festival: FestivalUpdate; co
       aria-live="polite"
     >
       {[
-        { label: "Days", value: countdown.days },
-        { label: "Hours", value: countdown.hours },
-        { label: "Minutes", value: countdown.minutes },
-        { label: "Seconds", value: countdown.seconds },
+        { label: t.festivals.countdownDays, value: countdown.days },
+        { label: t.festivals.countdownHours, value: countdown.hours },
+        { label: t.festivals.countdownMinutes, value: countdown.minutes },
+        { label: t.festivals.countdownSeconds, value: countdown.seconds },
       ].map((unit) => (
         <div
           key={unit.label}
@@ -140,7 +153,10 @@ function isFestivalToday(festival: FestivalUpdate, now = new Date()): boolean {
 }
 
 export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) {
+  const { t, language } = useLanguage();
+  const locale = language === "hi" ? "hi-IN" : "en-IN";
   const [selectedFestival, setSelectedFestival] = useState<FestivalUpdate | null>(null);
+
   const upcoming = useMemo(() => {
     const now = Date.now();
     return festivals
@@ -166,11 +182,11 @@ export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) 
   return (
     <Section id="festivals">
       <SectionHeading
-        eyebrow="UPCOMING FESTIVALS"
-        title="Upcoming Festivals & Celebrations"
-        hindi="आगामी पर्व एवं उत्सव"
+        eyebrow={t.festivals.eyebrow}
+        title={t.festivals.title}
+        hindi={t.festivals.hindi}
       >
-        Mark your calendar for celebrations that bring the temple and the community fully alive.
+        {t.festivals.subtitle}
       </SectionHeading>
 
       {next ? (
@@ -185,7 +201,7 @@ export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) 
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-ink/85 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-cream">
                 <Sparkles className="h-3.5 w-3.5 text-gold" />
-                {isToday ? "🌟 Today's Sacred Festival" : "Next Festival"}
+                {isToday ? t.festivals.todayFestival : t.festivals.nextFestival}
               </div>
               <h3 className="mt-5 font-display text-4xl font-semibold text-ink sm:text-5xl">
                 {next.name}
@@ -193,7 +209,7 @@ export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) 
               <p className="mt-4 inline-flex items-start gap-2 text-sm font-medium text-ink/70">
                 <Calendar className="mt-0.5 h-4 w-4 shrink-0" />
                 <span>
-                  <FestivalDateRange festival={next} />
+                  <FestivalDateRange festival={next} locale={locale} />
                 </span>
               </p>
             </div>
@@ -215,6 +231,8 @@ export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) 
 }
 
 function UpcomingFestivalSlider({ festivals }: { festivals: FestivalUpdate[] }) {
+  const { t, language } = useLanguage();
+  const locale = language === "hi" ? "hi-IN" : "en-IN";
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -269,7 +287,7 @@ function UpcomingFestivalSlider({ festivals }: { festivals: FestivalUpdate[] }) 
       onPointerCancel={() => setPaused(false)}
     >
       <div className="text-[10px] font-semibold uppercase tracking-widest text-saffron-deep">
-        Upcoming Festivals
+        {t.festivals.upcomingFestivals}
       </div>
       {festival ? (
         <div className="relative mt-4 min-h-[24rem] overflow-hidden">
@@ -296,7 +314,7 @@ function UpcomingFestivalSlider({ festivals }: { festivals: FestivalUpdate[] }) 
               <p className="mt-3 inline-flex items-start gap-2 text-sm text-muted-foreground">
                 <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
                 <span>
-                  <FestivalDateRange festival={festival} />
+                  <FestivalDateRange festival={festival} locale={locale} />
                 </span>
               </p>
               {festival.description && (
@@ -321,6 +339,18 @@ function FestivalCalendar({
   festivals: FestivalUpdate[];
   onSelect: (festival: FestivalUpdate) => void;
 }) {
+  const { t, language } = useLanguage();
+  const locale = language === "hi" ? "hi-IN" : "en-IN";
+  const weekdays = [
+    t.festivals.weekdays.sun,
+    t.festivals.weekdays.mon,
+    t.festivals.weekdays.tue,
+    t.festivals.weekdays.wed,
+    t.festivals.weekdays.thu,
+    t.festivals.weekdays.fri,
+    t.festivals.weekdays.sat,
+  ];
+
   const today = new Date();
   const [month, setMonth] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
   const year = month.getFullYear();
@@ -355,7 +385,7 @@ function FestivalCalendar({
           <ChevronLeft className="h-5 w-5" />
         </button>
         <h3 className="font-display text-xl font-semibold text-ink">
-          {month.toLocaleDateString("en-IN", { month: "long", year: "numeric" })}
+          {month.toLocaleDateString(locale, { month: "long", year: "numeric" })}
         </h3>
         <button
           type="button"
@@ -368,7 +398,7 @@ function FestivalCalendar({
       </div>
 
       <div className="mt-5 grid grid-cols-7 gap-1 text-center">
-        {WEEKDAYS.map((weekday) => (
+        {weekdays.map((weekday) => (
           <div
             key={weekday}
             className="py-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground"
@@ -431,6 +461,9 @@ function FestivalModal({
   festival: FestivalUpdate | null;
   onClose: () => void;
 }) {
+  const { t, language } = useLanguage();
+  const locale = language === "hi" ? "hi-IN" : "en-IN";
+
   return (
     <AnimatePresence>
       {festival && (
@@ -456,7 +489,7 @@ function FestivalModal({
               type="button"
               autoFocus
               onClick={onClose}
-              aria-label="Close festival"
+              aria-label={t.festivals.closeModalAria}
               className="interactive-surface absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-ink/70 text-cream backdrop-blur hover:bg-ink/85 sm:right-4 sm:top-4"
             >
               <X className="h-5 w-5" />
@@ -473,7 +506,7 @@ function FestivalModal({
             )}
             <div className="p-5 sm:p-8">
               <div className="text-[10px] font-semibold uppercase tracking-widest text-saffron-deep">
-                Festival Celebration
+                {t.festivals.todayFestival}
               </div>
               <h3 className="mt-3 pr-10 font-display text-3xl font-semibold text-ink">
                 {festival.name}
@@ -481,7 +514,7 @@ function FestivalModal({
               <p className="mt-3 inline-flex items-start gap-2 text-sm text-muted-foreground">
                 <Calendar className="mt-0.5 h-4 w-4 shrink-0 text-saffron-deep" />
                 <span>
-                  <FestivalDateRange festival={festival} />
+                  <FestivalDateRange festival={festival} locale={locale} />
                 </span>
               </p>
               {festival.description && (
@@ -503,16 +536,18 @@ function FestivalModal({
 }
 
 function FestivalEmptyState({ className = "" }: { className?: string }) {
+  const { t } = useLanguage();
+
   return (
     <div
       className={`rounded-2xl border border-dashed border-gold/50 bg-card/70 p-8 text-center ${className}`}
       role="status"
     >
       <p className="font-display text-xl font-semibold text-ink">
-        No upcoming festivals are available yet.
+        {t.festivals.emptyTitle}
       </p>
       <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-        Festival dates will appear here when they are added to the temple calendar.
+        {t.festivals.subtitle}
       </p>
     </div>
   );

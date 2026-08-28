@@ -7,6 +7,7 @@ import {
   UPDATES_SEEN_STORAGE_KEY,
 } from "@/lib/updates-notifications";
 import type { TempleUpdate, TempleUpdateCategory } from "@/lib/updates";
+import { useLanguage } from "@/lib/i18n";
 import { Section, SectionHeading } from "./Section";
 
 const categoryIcons = {
@@ -15,8 +16,8 @@ const categoryIcons = {
   "Temple Notice": Bell,
 } satisfies Record<TempleUpdateCategory, typeof Users>;
 
-function formatDate(value: string) {
-  return new Date(value).toLocaleDateString("en-IN", {
+function formatDate(value: string, locale = "en-IN") {
+  return new Date(value).toLocaleDateString(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -24,20 +25,41 @@ function formatDate(value: string) {
   });
 }
 
-function UpdateDateRange({ update }: { update: TempleUpdate }) {
+function UpdateDateRange({
+  update,
+  locale,
+  startsLabel,
+  endsLabel,
+}: {
+  update: TempleUpdate;
+  locale: string;
+  startsLabel: string;
+  endsLabel: string;
+}) {
   if (!update.startDate && !update.endDate) return null;
 
   return (
     <p className="mt-3 text-xs font-medium text-muted-foreground">
-      {update.startDate && <>Starts {formatDate(update.startDate)}</>}
+      {update.startDate && (
+        <>
+          {startsLabel} {formatDate(update.startDate, locale)}
+        </>
+      )}
       {update.startDate && update.endDate && " | "}
-      {update.endDate && <>Ends {formatDate(update.endDate)}</>}
+      {update.endDate && (
+        <>
+          {endsLabel} {formatDate(update.endDate, locale)}
+        </>
+      )}
     </p>
   );
 }
 
 export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
+  const { t, language } = useLanguage();
+  const locale = language === "hi" ? "hi-IN" : "en-IN";
   const [selectedUpdate, setSelectedUpdate] = useState<TempleUpdate | null>(null);
+
   const featured = useMemo(
     () => updates.filter((update) => update.featured).sort(byNewest)[0],
     [updates],
@@ -90,12 +112,11 @@ export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
   return (
     <Section id="updates" className="bg-secondary/30">
       <SectionHeading
-        eyebrow="Temple Updates"
-        title="Community News & Notices"
-        hindi="मंदिर समाचार एवं सूचनाएँ"
+        eyebrow={t.updates.eyebrow}
+        title={t.updates.title}
+        hindi={t.updates.hindi}
       >
-        Official community posts, festival notices, event announcements and important updates will
-        be published here.
+        {t.updates.subtitle}
       </SectionHeading>
 
       {featured && (
@@ -118,15 +139,20 @@ export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
             )}
             <div className="p-7 sm:p-9">
               <div className="text-[10px] font-semibold uppercase tracking-widest text-saffron-deep">
-                Featured Update · {featured.category}
+                {t.updates.featuredUpdate} · {featured.category}
               </div>
               <h3 className="mt-3 font-display text-3xl font-semibold text-ink sm:text-4xl">
                 {featured.title}
               </h3>
               <p className="mt-2 text-xs font-medium text-muted-foreground">
-                {formatDate(featured.publishedAt)}
+                {formatDate(featured.publishedAt, locale)}
               </p>
-              <UpdateDateRange update={featured} />
+              <UpdateDateRange
+                update={featured}
+                locale={locale}
+                startsLabel={t.updates.starts}
+                endsLabel={t.updates.ends}
+              />
               <p className="mt-5 text-sm leading-relaxed text-muted-foreground sm:text-base">
                 {featured.summary}
               </p>
@@ -137,7 +163,9 @@ export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
 
       {recent.length > 0 && (
         <div className="mt-12">
-          <h3 className="font-display text-2xl font-semibold text-ink">Recent Updates</h3>
+          <h3 className="font-display text-2xl font-semibold text-ink">
+            {t.updates.recentUpdates}
+          </h3>
           <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {recent.map((update, index) => {
               const Icon = categoryIcons[update.category];
@@ -181,13 +209,18 @@ export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
                         dateTime={update.publishedAt}
                         className="shrink-0 text-[11px] text-muted-foreground"
                       >
-                        {formatDate(update.publishedAt)}
+                        {formatDate(update.publishedAt, locale)}
                       </time>
                     </div>
                     <h4 className="mt-4 font-display text-xl font-semibold text-ink">
                       {update.title}
                     </h4>
-                    <UpdateDateRange update={update} />
+                    <UpdateDateRange
+                      update={update}
+                      locale={locale}
+                      startsLabel={t.updates.starts}
+                      endsLabel={t.updates.ends}
+                    />
                     <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-muted-foreground">
                       {update.summary}
                     </p>
@@ -205,11 +238,10 @@ export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
           role="status"
         >
           <p className="font-display text-xl font-semibold text-ink">
-            No updates have been published yet.
+            {t.updates.emptyTitle}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Please check back for official temple announcements, festival updates and community
-            news.
+            {t.updates.emptyDesc}
           </p>
         </div>
       )}
@@ -238,7 +270,7 @@ export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
                 type="button"
                 autoFocus
                 onClick={() => setSelectedUpdate(null)}
-                aria-label="Close update"
+                aria-label={t.updates.closeUpdateAria}
                 className="interactive-surface absolute right-3 top-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-ink/70 text-cream backdrop-blur hover:bg-ink/85 sm:right-4 sm:top-4"
               >
                 <X className="h-5 w-5" />
@@ -261,9 +293,14 @@ export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
                   {selectedUpdate.title}
                 </h3>
                 <p className="mt-2 text-xs font-medium text-muted-foreground">
-                  {formatDate(selectedUpdate.publishedAt)}
+                  {formatDate(selectedUpdate.publishedAt, locale)}
                 </p>
-                <UpdateDateRange update={selectedUpdate} />
+                <UpdateDateRange
+                  update={selectedUpdate}
+                  locale={locale}
+                  startsLabel={t.updates.starts}
+                  endsLabel={t.updates.ends}
+                />
                 <p className="mt-5 whitespace-pre-wrap text-sm leading-relaxed text-muted-foreground sm:text-base">
                   {selectedUpdate.content || selectedUpdate.summary}
                 </p>

@@ -5,8 +5,6 @@ import {
   Camera,
   ChevronDown,
   ExternalLink,
-  FileText,
-  Info,
   Layers,
   MapPin,
   Maximize2,
@@ -15,6 +13,7 @@ import {
   X,
 } from "lucide-react";
 import type { WikimediaFile } from "@/lib/wikimedia/commons";
+import { useLanguage } from "@/lib/i18n";
 
 export function WikimediaImageModal({
   file,
@@ -23,6 +22,7 @@ export function WikimediaImageModal({
   file: WikimediaFile | null;
   onClose: () => void;
 }) {
+  const { t } = useLanguage();
   const [showTechnical, setShowTechnical] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
@@ -205,7 +205,7 @@ export function WikimediaImageModal({
                       rel="noopener noreferrer"
                       className="interactive-surface inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl gradient-saffron px-4 py-2.5 text-center text-xs font-semibold text-primary-foreground shadow-sacred hover:shadow-glow"
                     >
-                      View on Wikimedia Commons
+                      {t.heritage.exploreCommonsBtn}
                       <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                     </a>
 
@@ -215,17 +215,7 @@ export function WikimediaImageModal({
                       rel="noopener noreferrer"
                       className="interactive-surface inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-2.5 text-center text-xs font-semibold text-ink hover:border-gold hover:bg-secondary"
                     >
-                      Open Media Viewer
-                      <ExternalLink className="h-3.5 w-3.5 shrink-0" />
-                    </a>
-
-                    <a
-                      href={file.pageUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="interactive-surface inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-4 py-2.5 text-center text-xs font-semibold text-ink hover:border-gold hover:bg-secondary"
-                    >
-                      View Original on Wikimedia Commons
+                      {t.heritage.openMediaViewer}
                       <ExternalLink className="h-3.5 w-3.5 shrink-0" />
                     </a>
                   </div>
@@ -252,7 +242,7 @@ export function WikimediaImageModal({
                         <Calendar className="h-4 w-4 shrink-0 text-saffron-deep" />
                         <div className="min-w-0 flex-1">
                           <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                            Captured / Date
+                            {t.heritage.capturedDateLabel}
                           </div>
                           <div className="truncate text-xs font-semibold text-ink">
                             {file.date}
@@ -265,7 +255,7 @@ export function WikimediaImageModal({
                       <User className="h-4 w-4 shrink-0 text-saffron-deep" />
                       <div className="min-w-0 flex-1">
                         <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Contributor
+                          {t.heritage.contributorLabel}
                         </div>
                         <div className="truncate text-xs font-semibold text-ink">
                           {file.author}
@@ -277,10 +267,10 @@ export function WikimediaImageModal({
                       <MapPin className="h-4 w-4 shrink-0 text-saffron-deep" />
                       <div className="min-w-0 flex-1">
                         <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Location
+                          {t.heritage.locationLabel}
                         </div>
                         <div className="truncate text-xs font-semibold text-ink">
-                          Dariyapur, Kanti
+                          {t.heritage.locationValue}
                         </div>
                       </div>
                     </div>
@@ -289,7 +279,7 @@ export function WikimediaImageModal({
                       <Layers className="h-4 w-4 shrink-0 text-saffron-deep" />
                       <div className="min-w-0 flex-1">
                         <div className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                          Dimensions &amp; Size
+                          {t.heritage.dimensionsLabel}
                         </div>
                         <div className="truncate text-xs font-semibold text-ink">
                           {file.width && file.height
@@ -330,14 +320,13 @@ export function WikimediaImageModal({
                       <ShieldCheck className="h-5 w-5 shrink-0 text-saffron-deep" />
                       <div className="min-w-0 flex-1">
                         <div className="text-[11px] font-bold uppercase tracking-wider text-saffron-deep">
-                          Wikimedia Licensing &amp; Attribution
+                          {t.heritage.licensingTitle}
                         </div>
                         <div className="mt-1 text-xs font-semibold text-ink">
                           {file.licenseName} ({file.license})
                         </div>
                         <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                          This media is shared under the Creative Commons Attribution-ShareAlike 4.0
-                          International license on Wikimedia Commons.
+                          {t.heritage.licensingDesc}
                         </p>
                         {file.licenseUrl && (
                           <a
@@ -346,7 +335,7 @@ export function WikimediaImageModal({
                             rel="noopener noreferrer"
                             className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-saffron-deep underline-offset-4 hover:underline"
                           >
-                            Read License Terms
+                            {t.heritage.readLicenseTerms}
                             <ExternalLink className="h-3 w-3" />
                           </a>
                         )}
@@ -364,7 +353,7 @@ export function WikimediaImageModal({
                       >
                         <div className="flex items-center gap-2">
                           <Camera className="h-4 w-4 text-saffron-deep" />
-                          <span>Technical Camera &amp; EXIF Metadata</span>
+                          <span>{t.heritage.technicalExifLabel}</span>
                         </div>
                         <ChevronDown
                           className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
