@@ -767,6 +767,7 @@ export function Contact() {
               <input
                 required
                 minLength={2}
+                maxLength={100}
                 id="name"
                 name="name"
                 type="text"
@@ -778,6 +779,7 @@ export function Contact() {
             <Field label="Email Address" id="email">
               <input
                 required
+                maxLength={120}
                 id="email"
                 name="email"
                 type="email"
@@ -802,6 +804,7 @@ export function Contact() {
             </Field>
             <Field label="Phone Number (Optional)" id="phone">
               <input
+                maxLength={30}
                 id="phone"
                 name="phone"
                 type="tel"
@@ -846,6 +849,7 @@ export function Contact() {
               <textarea
                 required
                 minLength={10}
+                maxLength={1500}
                 id="message"
                 name="message"
                 rows={4}

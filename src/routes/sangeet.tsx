@@ -67,7 +67,7 @@ function SangeetPage() {
 
         <Section className="pt-8 sm:pt-10">
           <blockquote className="interactive-surface mx-auto max-w-3xl rounded-3xl border border-gold/30 bg-card px-5 py-10 text-center shadow-sacred hover:border-gold/50 hover:shadow-glow sm:px-12 sm:py-12">
-            <p className="font-hindi text-3xl font-semibold text-saffron-deep sm:text-4xl">
+            <p lang="sa" className="font-hindi text-3xl font-semibold text-saffron-deep sm:text-4xl">
               “नाद ही ब्रह्म है”
             </p>
             <p className="mt-5 font-display text-xl text-ink sm:text-2xl">

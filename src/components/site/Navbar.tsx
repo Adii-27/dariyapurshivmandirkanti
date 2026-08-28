@@ -8,25 +8,28 @@ import {
   UPDATES_SEEN_STORAGE_KEY,
 } from "@/lib/updates-notifications";
 import { INSTALL_AVAILABLE_EVENT, REQUEST_INSTALL_EVENT } from "@/lib/push";
-
-const links = [
-  { href: "/#home", label: "Home" },
-  { href: "/#about", label: "About" },
-  { href: "/heritage", label: "Heritage" },
-  { href: "/#gallery", label: "Gallery" },
-  { href: "/sangeet", label: "Sangeet" },
-  { href: "/#seva", label: "Seva" },
-  { href: "/#visit", label: "Visitor Information" },
-  { href: "/#location", label: "Location" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/#contact", label: "Contact Us" },
-];
+import { useLanguage } from "@/lib/i18n";
+import { LanguageSelector } from "./LanguageSelector";
 
 export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
+  const { t } = useLanguage();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [unseenUpdates, setUnseenUpdates] = useState(0);
   const [canInstall, setCanInstall] = useState(false);
+
+  const links = [
+    { href: "/#home", label: t.nav.home },
+    { href: "/#about", label: t.nav.about },
+    { href: "/heritage", label: t.nav.heritage },
+    { href: "/#gallery", label: t.nav.gallery },
+    { href: "/sangeet", label: t.nav.sangeet },
+    { href: "/#seva", label: t.nav.seva },
+    { href: "/#visit", label: t.nav.visitorInfo },
+    { href: "/#location", label: t.nav.location },
+    { href: "/faq", label: t.nav.faq },
+    { href: "/#contact", label: t.nav.contact },
+  ];
 
   useEffect(() => {
     const markInstallAvailable = () => setCanInstall(true);
@@ -115,12 +118,13 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LanguageSelector variant="desktop" />
           <a
             href="/#updates"
             onClick={markUpdatesSeen}
             className="interactive-surface hidden min-h-11 items-center rounded-full gradient-saffron px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sacred md:inline-flex"
           >
-            Updates
+            {t.nav.updates}
             {unseenUpdates > 0 && (
               <span className="ml-2 rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold tabular-nums text-saffron-deep">
                 {unseenUpdates}
@@ -128,7 +132,7 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
             )}
           </a>
           <button
-            aria-label={`${open ? "Close" : "Open"} menu${
+            aria-label={`${open ? t.footer.closeMenu : t.footer.openMenu}${
               unseenUpdates > 0
                 ? `, ${unseenUpdates} unread update${unseenUpdates === 1 ? "" : "s"}`
                 : ""
@@ -162,6 +166,9 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
             className="mx-4 mt-3 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-3 shadow-sacred backdrop-blur-xl sm:mx-6 lg:hidden"
           >
             <ul className="flex flex-col">
+              <li className="mb-2">
+                <LanguageSelector variant="mobile" />
+              </li>
               {links.map((l) => (
                 <li key={l.href}>
                   <a
@@ -184,7 +191,7 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
                     className="interactive-surface flex min-h-11 w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-sm font-medium text-saffron-deep hover:bg-gold-soft"
                   >
                     <Download className="h-4 w-4" />
-                    📲 Install App
+                    📲 {t.nav.installApp}
                   </button>
                 </li>
               )}
@@ -197,7 +204,7 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
                   href="/#updates"
                   className="interactive-surface flex min-h-11 items-center justify-center rounded-full gradient-saffron px-5 py-3 text-sm font-semibold text-primary-foreground shadow-sacred"
                 >
-                  Updates
+                  {t.nav.updates}
                   {unseenUpdates > 0 && (
                     <span className="ml-2 rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold tabular-nums text-saffron-deep">
                       {unseenUpdates}

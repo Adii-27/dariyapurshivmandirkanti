@@ -26,9 +26,12 @@ export function WikimediaImageModal({
   const [showTechnical, setShowTechnical] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!file) return;
+
+    previousFocusRef.current = (document.activeElement as HTMLElement) || null;
 
     // Reset technical accordion on new file
     setShowTechnical(false);
@@ -52,6 +55,35 @@ export function WikimediaImageModal({
       if (e.key === "Escape") {
         e.preventDefault();
         onClose();
+        return;
+      }
+
+      if (e.key === "Tab" && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusableElements.length === 0) return;
+
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (
+            document.activeElement === first ||
+            !modalRef.current.contains(document.activeElement)
+          ) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (
+            document.activeElement === last ||
+            !modalRef.current.contains(document.activeElement)
+          ) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     };
 
@@ -62,6 +94,7 @@ export function WikimediaImageModal({
       document.body.style.overflow = previousOverflow;
       document.body.style.paddingRight = previousPaddingRight;
       window.removeEventListener("keydown", onKeyDown);
+      previousFocusRef.current?.focus();
     };
   }, [file, onClose]);
 

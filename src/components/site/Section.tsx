@@ -40,7 +40,11 @@ export function SectionHeading({
       >
         {title}
       </motion.h2>
-      {hindi && <p className="font-hindi mt-3 text-xl text-saffron-deep sm:text-2xl">{hindi}</p>}
+      {hindi && (
+        <p lang="hi" className="font-hindi mt-3 text-xl text-saffron-deep sm:text-2xl">
+          {hindi}
+        </p>
+      )}
       {children && (
         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
           {children}

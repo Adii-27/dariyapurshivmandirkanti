@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Images, X } from "lucide-react";
 import {
@@ -25,6 +25,9 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
   const [filter, setFilter] = useState<Filter>("All");
   const [expanded, setExpanded] = useState(false);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
   const preview = useMemo(
     () => (photos === TEMPLE_PHOTOS ? GALLERY_PREVIEW : photos.slice(0, 8)),
     [photos],
@@ -55,16 +58,50 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
 
   useEffect(() => {
     if (openIdx === null) return;
+
+    previousFocusRef.current = (document.activeElement as HTMLElement) || null;
+
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpenIdx(null);
       if (event.key === "ArrowRight") next();
       if (event.key === "ArrowLeft") prev();
+
+      if (event.key === "Tab" && modalRef.current) {
+        const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+          'button, [href], [tabindex]:not([tabindex="-1"])',
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (event.shiftKey) {
+          if (
+            document.activeElement === first ||
+            !modalRef.current.contains(document.activeElement)
+          ) {
+            event.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (
+            document.activeElement === last ||
+            !modalRef.current.contains(document.activeElement)
+          ) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      }
     };
+
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
+
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
+      previousFocusRef.current?.focus();
     };
   }, [next, openIdx, prev]);
 
@@ -152,6 +189,7 @@ export function Gallery({ photos = TEMPLE_PHOTOS }: { photos?: TemplePhoto[] }) 
       <AnimatePresence>
         {openIdx !== null && visible[openIdx] && (
           <motion.div
+            ref={modalRef}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

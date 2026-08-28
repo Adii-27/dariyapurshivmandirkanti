@@ -26,6 +26,7 @@ import {
   NOTIFICATION_STATE_CHANGED_EVENT,
   REQUEST_INSTALL_EVENT,
 } from "@/lib/push";
+import { useLanguage } from "@/lib/i18n";
 
 const VISITOR_COUNTER_URL = "/api/visitors";
 const VISITOR_SESSION_KEY = "dsmk-visitor-counted";
@@ -210,21 +211,23 @@ const LotusIcon = (p: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-const quickLinks = [
-  ["/#home", "Home"],
-  ["/#about", "About"],
-  ["/heritage", "Heritage"],
-  ["/#gallery", "Gallery"],
-  ["/sangeet", "Sangeet"],
-  ["/#seva", "Seva"],
-  ["/#visit", "Visitor Information"],
-  ["/#location", "Location"],
-  ["/faq", "FAQ"],
-  ["/#contact", "Contact Us"],
-  ["/#updates", "Updates"],
-] as const;
-
 export function Footer() {
+  const { t } = useLanguage();
+
+  const quickLinks = [
+    ["/#home", t.nav.home],
+    ["/#about", t.nav.about],
+    ["/heritage", t.nav.heritage],
+    ["/#gallery", t.nav.gallery],
+    ["/sangeet", t.nav.sangeet],
+    ["/#seva", t.nav.seva],
+    ["/#visit", t.nav.visitorInfo],
+    ["/#location", t.nav.location],
+    ["/faq", t.nav.faq],
+    ["/#contact", t.nav.contact],
+    ["/#updates", t.nav.updates],
+  ] as const;
+
   return (
     <footer className="relative mt-16 overflow-hidden bg-[#18110b] text-cream/85 border-t border-gold-soft/25">
       {/* Subtle sacred ambient light */}
@@ -279,7 +282,7 @@ export function Footer() {
           <div>
             <h4 className="flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-gold-soft">
               <Link2 className="h-3.5 w-3.5 text-gold-soft" />
-              QUICK LINKS
+              {t.footer.quickLinks.toUpperCase()}
             </h4>
             <ul className="mt-5 space-y-0 text-sm">
               {quickLinks.map(([href, label]) => (
@@ -300,7 +303,7 @@ export function Footer() {
           <div className="space-y-6">
             <h4 className="flex items-center gap-2 font-display text-xs font-bold uppercase tracking-[0.2em] text-gold-soft">
               <MapPin className="h-3.5 w-3.5 text-gold-soft" />
-              VISIT
+              {t.footer.visitorInfo.toUpperCase()}
             </h4>
 
             {/* Opening Hours */}
@@ -332,7 +335,7 @@ export function Footer() {
                 className="inline-flex items-center gap-1.5 rounded-full border border-gold-soft/40 bg-[#221811]/90 px-4 py-2 text-xs font-semibold text-gold-soft shadow-sm transition-all hover:border-gold-soft hover:bg-gold-soft/15 hover:scale-[1.02]"
               >
                 <MapPin className="h-3.5 w-3.5 text-gold-soft" />
-                View on Google Maps →
+                {t.footer.openGoogleMaps} →
               </a>
             </div>
 
@@ -454,6 +457,7 @@ export function Footer() {
  * Fully synchronized with browser push status and PushSubscription
  */
 function NotificationPreferenceCard() {
+  const { t } = useLanguage();
   const [supported, setSupported] = useState(true);
   const [permission, setPermission] = useState<NotificationPermission>("default");
   const [subscribed, setSubscribed] = useState(false);
@@ -601,7 +605,7 @@ function NotificationPreferenceCard() {
 
         <div className="min-w-0 flex-1">
           <h5 className="font-display text-xs font-bold uppercase tracking-wider text-gold-soft">
-            TEMPLE NOTIFICATIONS
+            {t.footer.templeNotifications}
           </h5>
           <p className="mt-1 text-[11px] leading-relaxed text-cream/70">
             Stay updated with important temple notices, festival reminders and special
@@ -631,7 +635,7 @@ function NotificationPreferenceCard() {
       ) : (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-cream">Notifications</span>
+            <span className="text-xs font-medium text-cream">{t.footer.templeNotifications}</span>
 
             {/* Accessible Toggle Button matching mockup */}
             <button
@@ -656,9 +660,9 @@ function NotificationPreferenceCard() {
                 {loading ? (
                   <Loader2 className="h-3 w-3 animate-spin text-[#e65c00]" />
                 ) : subscribed ? (
-                  "ON"
+                  t.footer.notificationsOn
                 ) : (
-                  "OFF"
+                  t.footer.notificationsOff
                 )}
               </span>
             </button>
@@ -668,7 +672,7 @@ function NotificationPreferenceCard() {
           {subscribed && (
             <div className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-400">
               <Check className="h-3.5 w-3.5 text-emerald-400 stroke-[2.5]" />
-              <span>You are subscribed to notifications</span>
+              <span>{t.footer.subscribedConfirmation}</span>
             </div>
           )}
         </div>
@@ -682,6 +686,7 @@ function NotificationPreferenceCard() {
  * Reuses existing PWA installation state and beforeinstallprompt mechanism
  */
 function InstallAppCard() {
+  const { t } = useLanguage();
   const [installed, setInstalled] = useState(false);
   const [working, setWorking] = useState(false);
   const deferredPromptRef = useRef<{ prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> } | null>(null);
@@ -757,12 +762,12 @@ function InstallAppCard() {
 
         <div className="min-w-0 flex-1">
           <h5 className="font-display text-xs font-bold uppercase tracking-wider text-gold-soft">
-            {installed ? "✓ APP INSTALLED" : "INSTALL APP"}
+            {installed ? t.footer.appInstalledTitle : t.footer.installAppTitle}
           </h5>
           <p className="mt-1 text-[11px] leading-relaxed text-cream/70">
             {installed
-              ? "Dariyapur Shiv Mandir is installed on your device."
-              : "Install Dariyapur Shiv Mandir for a faster app-like experience."}
+              ? t.footer.appInstalledDesc
+              : t.footer.installAppDesc}
           </p>
         </div>
       </div>
@@ -781,12 +786,12 @@ function InstallAppCard() {
         {installed ? (
           <>
             <Check className="h-4 w-4 text-emerald-400 stroke-[2.5]" />
-            <span>✓ App Installed</span>
+            <span>{t.footer.appInstalledTitle}</span>
           </>
         ) : (
           <>
             <Download className="h-4 w-4 stroke-[2.5]" />
-            <span>Install App</span>
+            <span>{t.footer.installAppTitle}</span>
           </>
         )}
       </button>
@@ -821,6 +826,7 @@ function InstallAppCard() {
 }
 
 function VisitorCounter() {
+  const { t } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const hasStarted = useRef(false);
   const displayCountRef = useRef(0);
@@ -898,7 +904,7 @@ function VisitorCounter() {
     >
       <div className="flex items-center gap-2 font-medium text-cream/80 text-xs sm:text-sm">
         <Users className="h-4 w-4 text-[#a855f7]" />
-        <span>Temple Website Visitors</span>
+        <span>{t.footer.websiteVisitors}</span>
       </div>
       <span className="shrink-0 font-bold tabular-nums text-sm sm:text-base text-gold-soft">
         {count !== null

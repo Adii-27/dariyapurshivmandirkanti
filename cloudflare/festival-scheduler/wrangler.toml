@@ -1,6 +1,10 @@
 name = "dariyapur-festival-scheduler"
 main = "src/index.ts"
 compatibility_date = "2026-08-25"
+workers_dev = false
 
 [triggers]
 crons = ["35 18 * * *"]
+
+[vars]
+VERCEL_FESTIVAL_ENDPOINT = "https://dariyapurshivmandirkantiorg.vercel.app/api/push/festivals/run"

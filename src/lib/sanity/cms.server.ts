@@ -338,7 +338,11 @@ async function fetchCmsContentFromSanity(): Promise<CmsContent | null> {
       .filter((item): item is TempleFaq => Boolean(item));
 
     return { gallery, videos, festivals, updates, faqs };
-  } catch {
+  } catch (error) {
+    console.error(
+      "[Sanity CMS] Query failure:",
+      error instanceof Error ? error.message : "Unknown error",
+    );
     return null;
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
@@ -359,8 +363,9 @@ export async function getCmsContentFromSanity(): Promise<CmsContent | null> {
     if (content) {
       cachedCmsContent = content;
       cmsCacheExpiresAt = Date.now() + CMS_CACHE_TTL_MS;
+      return content;
     }
-    return content ?? cachedCmsContent;
+    return cachedCmsContent;
   } finally {
     if (pendingCmsRequest === request) pendingCmsRequest = undefined;
   }

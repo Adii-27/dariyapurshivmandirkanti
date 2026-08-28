@@ -115,16 +115,40 @@ function Countdown({ festival, compact = false }: { festival: FestivalUpdate; co
   );
 }
 
+function getFestivalActiveEndTimestamp(festival: FestivalUpdate): number {
+  if (festival.endDate) {
+    return new Date(festival.endDate).getTime();
+  }
+  const dayKey = festivalDateKey(festival.date);
+  const endOfDayIst = new Date(`${dayKey}T23:59:59.999+05:30`).getTime();
+  return Number.isFinite(endOfDayIst)
+    ? endOfDayIst
+    : new Date(festival.date).getTime() + 86_400_000 - 1;
+}
+
+function isFestivalToday(festival: FestivalUpdate, now = new Date()): boolean {
+  const todayKey = new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: INDIA_TIME_ZONE,
+  }).format(now);
+  const festivalStartKey = festivalDateKey(festival.date);
+  const festivalEndKey = festival.endDate ? festivalDateKey(festival.endDate) : festivalStartKey;
+
+  return todayKey >= festivalStartKey && todayKey <= festivalEndKey;
+}
+
 export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) {
   const [selectedFestival, setSelectedFestival] = useState<FestivalUpdate | null>(null);
   const upcoming = useMemo(() => {
     const now = Date.now();
     return festivals
-      .filter((festival) => new Date(festival.endDate ?? festival.date).getTime() > now)
+      .filter((festival) => getFestivalActiveEndTimestamp(festival) >= now)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }, [festivals]);
-  const next =
-    upcoming.find((festival) => new Date(festival.date).getTime() > Date.now()) ?? upcoming[0];
+  const next = upcoming[0];
+  const isToday = next ? isFestivalToday(next) : false;
 
   useEffect(() => {
     if (!selectedFestival) return;
@@ -160,7 +184,8 @@ export function Festivals({ festivals = [] }: { festivals?: FestivalUpdate[] }) 
           <div className="grid items-center gap-8 lg:grid-cols-[1.15fr_1fr]">
             <div>
               <div className="inline-flex items-center gap-2 rounded-full bg-ink/85 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-widest text-cream">
-                <Sparkles className="h-3.5 w-3.5 text-gold" /> Next Festival
+                <Sparkles className="h-3.5 w-3.5 text-gold" />
+                {isToday ? "🌟 Today's Sacred Festival" : "Next Festival"}
               </div>
               <h3 className="mt-5 font-display text-4xl font-semibold text-ink sm:text-5xl">
                 {next.name}

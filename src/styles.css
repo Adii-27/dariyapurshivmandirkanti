@@ -271,7 +271,15 @@ section[id],
   *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
+    animation-play-state: paused !important;
     scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .interactive-surface,
+  .interactive-surface:hover,
+  .interactive-surface:active {
+    transform: none !important;
     transition-duration: 0.01ms !important;
   }
 }

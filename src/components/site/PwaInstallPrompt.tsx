@@ -70,6 +70,14 @@ export function PwaInstallPrompt() {
       }
     };
 
+    const onAppInstalled = () => {
+      markInstallHandled();
+      setVisible(false);
+      setDeferredPrompt(null);
+      deferredPromptRef.current = null;
+    };
+
+    window.addEventListener("appinstalled", onAppInstalled);
     window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
     window.addEventListener(REQUEST_INSTALL_EVENT, onManualRequest);
 
@@ -81,6 +89,7 @@ export function PwaInstallPrompt() {
     window.addEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
 
     return () => {
+      window.removeEventListener("appinstalled", onAppInstalled);
       window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
       window.removeEventListener(REQUEST_INSTALL_EVENT, onManualRequest);
       window.removeEventListener(PROMPT_OPEN_EVENT, closeForAnotherPrompt);
