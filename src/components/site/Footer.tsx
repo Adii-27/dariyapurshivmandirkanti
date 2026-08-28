@@ -634,35 +634,36 @@ function NotificationPreferenceCard() {
         </div>
       ) : (
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-cream">{t.footer.templeNotifications}</span>
+          <div className="flex items-center justify-between gap-3">
+            <span className="min-w-0 flex-1 text-xs font-medium text-cream">
+              {t.footer.templeNotifications}
+            </span>
 
-            {/* Accessible Toggle Button matching mockup */}
+            {/* Accessible Toggle Button */}
             <button
               type="button"
               role="switch"
               aria-checked={subscribed}
-              aria-label="Toggle Temple Notifications"
+              aria-label={`${t.footer.templeNotifications}: ${subscribed ? "ON" : "OFF"}`}
               disabled={loading}
               onClick={toggleSubscription}
-              className={`interactive-surface relative inline-flex h-7 w-14 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-gold-soft disabled:opacity-60 ${
-                subscribed
-                  ? "bg-[#e65c00] justify-end shadow-sacred"
-                  : "bg-cream/20 justify-start"
+              className={`interactive-surface relative inline-flex h-7 w-12 shrink-0 cursor-pointer items-center rounded-full p-0.5 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-gold-soft disabled:opacity-60 ${
+                subscribed ? "bg-[#e65c00] shadow-sacred" : "bg-cream/20"
               }`}
             >
-              {/* Knob */}
+              {/* Sliding Knob */}
               <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full bg-cream text-[10px] font-bold shadow-md transition-transform duration-200 ${
-                  subscribed ? "text-[#e65c00]" : "text-ink/60"
+                aria-hidden="true"
+                className={`pointer-events-none flex h-6 w-6 items-center justify-center rounded-full bg-cream shadow-md transition-transform duration-200 ease-out ${
+                  subscribed ? "translate-x-5 text-[#e65c00]" : "translate-x-0 text-ink/60"
                 }`}
               >
                 {loading ? (
-                  <Loader2 className="h-3 w-3 animate-spin text-[#e65c00]" />
-                ) : subscribed ? (
-                  t.footer.notificationsOn
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#e65c00]" />
                 ) : (
-                  t.footer.notificationsOff
+                  <span className="text-[9px] font-bold leading-none select-none tracking-tight">
+                    {subscribed ? "ON" : "OFF"}
+                  </span>
                 )}
               </span>
             </button>

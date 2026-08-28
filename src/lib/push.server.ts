@@ -139,7 +139,12 @@ export async function deliverPush(payload: TemplePushPayload) {
 export function verifySanityWebhook(rawBody: string, signature: string | null) {
   const secret = getServerConfig().sanityPushWebhookSecret;
   if (!secret || !signature) return false;
-  const values = Object.fromEntries(signature.split(",").map((part) => part.split("=", 2)));
+  const values = Object.fromEntries(
+    signature.split(",").map((part) => {
+      const [key, value] = part.split("=", 2);
+      return [key.trim(), value?.trim()];
+    }),
+  );
   const timestamp = values.t;
   const expected = values.v1;
   if (!timestamp || !expected || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300)
