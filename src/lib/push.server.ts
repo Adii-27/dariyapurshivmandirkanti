@@ -147,8 +147,11 @@ export function verifySanityWebhook(rawBody: string, signature: string | null) {
   );
   const timestamp = values.t;
   const expected = values.v1;
-  if (!timestamp || !expected || Math.abs(Date.now() / 1000 - Number(timestamp)) > 300)
-    return false;
+  if (!timestamp || !expected) return false;
+
+  const ts = Number(timestamp);
+  const tsMs = ts < 1e11 ? ts * 1000 : ts;
+  if (Number.isNaN(tsMs) || Math.abs(Date.now() - tsMs) > 300_000) return false;
 
   const digestBase64 = createHmac("sha256", secret)
     .update(`${timestamp}.${rawBody}`)
