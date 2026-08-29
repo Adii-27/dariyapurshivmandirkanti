@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Eye, Images, MapPin } from "lucide-react";
-import { HERO_IMAGE } from "@/lib/media";
 import { useLanguage } from "@/lib/i18n";
+import { ResponsiveHeroImage } from "./ResponsiveHeroImage";
 import { StatusCard } from "./StatusCard";
 
 export function Hero() {
@@ -11,12 +11,10 @@ export function Hero() {
     <section id="home" className="relative isolate overflow-hidden pt-24">
       {/* Background banner */}
       <div className="absolute inset-0 -z-10">
-        <img
-          src={HERO_IMAGE}
+        <ResponsiveHeroImage
           alt="Authentic sunset view of Dariyapur Shiv Mandir Kanti"
           loading="eager"
           fetchPriority="high"
-          decoding="async"
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/30 via-ink/50 to-cream" />

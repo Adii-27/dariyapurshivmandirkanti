@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Camera, Landmark, Sparkles, MapPin } from "lucide-react";
-import { HERO_IMAGE } from "@/lib/media";
 import { useLanguage } from "@/lib/i18n";
+import { ResponsiveHeroImage } from "../ResponsiveHeroImage";
 
 export function HeritageHero() {
   const { t } = useLanguage();
@@ -10,12 +10,10 @@ export function HeritageHero() {
     <section id="heritage-hero" className="relative isolate overflow-hidden pt-24">
       {/* Background with authentic temple banner */}
       <div className="absolute inset-0 -z-10">
-        <img
-          src={HERO_IMAGE}
+        <ResponsiveHeroImage
           alt="Authentic view of Dariyapur Shiv Mandir Kanti at sunset"
           loading="eager"
           fetchPriority="high"
-          decoding="async"
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/65 to-cream" />
@@ -103,11 +101,9 @@ export function HeritageHero() {
           >
             <div className="relative overflow-hidden rounded-3xl border border-gold/40 bg-card/90 p-2 shadow-sacred backdrop-blur-md sm:p-3">
               <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
-                <img
-                  src={HERO_IMAGE}
+                <ResponsiveHeroImage
                   alt="Dariyapur Shiv Mandir Kanti heritage facade"
                   loading="lazy"
-                  decoding="async"
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />

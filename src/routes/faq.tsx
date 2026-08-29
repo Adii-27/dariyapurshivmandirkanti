@@ -22,12 +22,12 @@ import {
 import { getCmsContent } from "@/lib/api/cms.functions";
 import type { CmsContent } from "@/lib/sanity/types";
 import { DEFAULT_FAQS, FAQ_CATEGORIES, type TempleFaq } from "@/lib/faq";
-import { HERO_IMAGE } from "@/lib/media";
 import { createSeoHead, SEO_PAGES } from "@/lib/seo";
 import { useLanguage } from "@/lib/i18n";
 import { Navbar } from "@/components/site/Navbar";
 import { Footer } from "@/components/site/Footer";
 import { Section } from "@/components/site/Section";
+import { ResponsiveHeroImage } from "@/components/site/ResponsiveHeroImage";
 
 const CMS_STALE_TIME_MS = 5 * 60_000;
 const ALL_CATEGORIES = ["All", ...FAQ_CATEGORIES] as const;
@@ -118,9 +118,10 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
       <main className="overflow-hidden pt-20 sm:pt-24">
         {/* Hero Banner with Temple Background and Divine Ornament */}
         <section className="relative isolate overflow-hidden">
-          <img
-            src={HERO_IMAGE}
+          <ResponsiveHeroImage
             alt="Dariyapur Shiv Mandir Kanti"
+            loading="eager"
+            fetchPriority="high"
             className="absolute inset-0 -z-10 h-full w-full object-cover"
           />
           <div className="absolute inset-0 -z-10 bg-gradient-to-b from-ink/80 via-ink/70 to-ink/85" />

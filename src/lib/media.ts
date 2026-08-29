@@ -15,9 +15,27 @@ const publicAsset = (path: string) => encodeURI(path);
 const photoAsset = (path: string) =>
   publicAsset(`/optimized${path.replace(/\.(?:jpe?g|png)$/i, ".jpg")}`);
 
-export const TEMPLE_LOGO = publicAsset("/logo.png");
+export const TEMPLE_LOGO = publicAsset("/optimized/brand/logo-192.webp");
 
 export const HERO_IMAGE = publicAsset("/Banner.png");
+
+export const HERO_IMAGE_SOURCES = {
+  width: 1672,
+  height: 941,
+  fallback: publicAsset("/optimized/hero/banner-1600.jpg"),
+  webp: {
+    w720: publicAsset("/optimized/hero/banner-720.webp"),
+    w1024: publicAsset("/optimized/hero/banner-1024.webp"),
+    w1600: publicAsset("/optimized/hero/banner-1600.webp"),
+    srcSet: `${publicAsset("/optimized/hero/banner-720.webp")} 720w, ${publicAsset("/optimized/hero/banner-1024.webp")} 1024w, ${publicAsset("/optimized/hero/banner-1600.webp")} 1600w`,
+  },
+  jpeg: {
+    w720: publicAsset("/optimized/hero/banner-720.jpg"),
+    w1024: publicAsset("/optimized/hero/banner-1024.jpg"),
+    w1600: publicAsset("/optimized/hero/banner-1600.jpg"),
+    srcSet: `${publicAsset("/optimized/hero/banner-720.jpg")} 720w, ${publicAsset("/optimized/hero/banner-1024.jpg")} 1024w, ${publicAsset("/optimized/hero/banner-1600.jpg")} 1600w`,
+  },
+} as const;
 
 const EVENING_SUNSET_IMAGE = photoAsset("/Temple images/Evening view/IMG20260609174111.jpg");
 

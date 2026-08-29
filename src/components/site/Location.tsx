@@ -1,4 +1,3 @@
-import { send } from "@emailjs/browser";
 import {
   useEffect,
   useRef,
@@ -581,6 +580,7 @@ export function Contact() {
     setSubmissionError(null);
 
     try {
+      const { send } = await import("@emailjs/browser");
       await send(
         serviceId,
         templateId,
