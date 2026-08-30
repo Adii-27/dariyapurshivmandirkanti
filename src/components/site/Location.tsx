@@ -545,6 +545,7 @@ export function Contact() {
       return;
     }
     const interval = window.setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
       setQuoteIndex((current) => (current + 1) % DEVOTIONAL_QUOTES.length);
     }, 4500);
     return () => window.clearInterval(interval);

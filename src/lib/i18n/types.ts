@@ -1,4 +1,4 @@
-export type Language = "en" | "hi";
+export type Language = "en" | "hi" | "mr" | "gu" | "kn" | "te" | "ta";
 
 export interface TranslationDictionary {
   nav: {
@@ -417,6 +417,7 @@ export interface TranslationDictionary {
     viewOnGoogleMaps: string;
     viewGoogleMaps: string;
     detailedDirections: string;
+    items: Record<string, { question: string; answer: string }>;
   };
   sangeet: {
     eyebrow: string;

@@ -92,20 +92,32 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
     General: t.faq.categories.general,
   };
 
+  const localizedFaqs = useMemo(() => {
+    return faqs.map((faq) => {
+      const localized = t.faq.items?.[faq.id];
+      return {
+        ...faq,
+        question: localized?.question ?? faq.question,
+        answer: localized?.answer ?? faq.answer,
+      };
+    });
+  }, [faqs, t.faq.items]);
+
   const filteredFaqs = useMemo(() => {
     const searchTerm = search.trim().toLocaleLowerCase();
 
-    return faqs.filter((faq) => {
+    return localizedFaqs.filter((faq) => {
       const matchesCategory = category === "All" || faq.category === category;
+      const localizedCategory = categoryLabels[faq.category] ?? faq.category;
       const matchesSearch =
         !searchTerm ||
-        [faq.question, faq.answer, faq.category].some((value) =>
+        [faq.question, faq.answer, faq.category, localizedCategory].some((value) =>
           value.toLocaleLowerCase().includes(searchTerm),
         );
 
       return matchesCategory && matchesSearch;
     });
-  }, [category, faqs, search]);
+  }, [category, categoryLabels, localizedFaqs, search]);
 
   const clearFilters = () => {
     setSearch("");
@@ -136,12 +148,17 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
               <div className="mx-auto mb-4 flex items-center justify-center gap-3 text-gold">
                 <span className="h-px w-12 bg-gradient-to-r from-transparent to-gold/70 sm:w-16" />
                 <svg
-                  viewBox="0 0 24 24"
+                  viewBox="0 0 32 32"
                   fill="currentColor"
-                  className="h-7 w-7 text-gold drop-shadow-md"
+                  className="h-8 w-8 text-gold drop-shadow-md"
                   aria-hidden="true"
                 >
-                  <path d="M11 2a1 1 0 0 1 2 0v5.18c2.18-.32 4.14-1.63 5.4-3.5a1 1 0 0 1 1.66 1.12C18.42 7.23 16 8.7 13 8.97V11h3a1 1 0 0 1 0 2h-3v8a1 1 0 0 1-2 0v-8H8a1 1 0 0 1 0-2h3V8.97C8 8.7 5.58 7.23 3.94 4.8a1 1 0 0 1 1.66-1.12C6.86 5.55 8.82 6.86 11 7.18V2z" />
+                  <path d="M16 1.5C15.3 3.6 13.8 6.6 13.8 9.6C13.8 11.8 14.8 13.5 15.3 14.6H16.7C17.2 13.5 18.2 11.8 18.2 9.6C18.2 6.6 16.7 3.6 16 1.5Z" />
+                  <path d="M4.8 5.2C5.3 7.8 6.7 11.8 9.8 13.8C11.3 14.8 13.2 15.3 15 15.4V13.8C13.6 13.6 12.2 13 11 11.8C9.2 10.1 8 7.2 7.2 5.1C6.4 5.1 5.6 5.1 4.8 5.2Z" />
+                  <path d="M27.2 5.2C26.7 7.8 25.3 11.8 22.2 13.8C20.7 14.8 18.8 15.3 17 15.4V13.8C18.4 13.6 19.8 13 21 11.8C22.8 10.1 24 7.2 24.8 5.1C25.6 5.1 26.4 5.1 27.2 5.2Z" />
+                  <path d="M12.8 15.8H19.2L16.8 17.5L19.2 19.2H12.8L15.2 17.5L12.8 15.8Z" />
+                  <rect x="15.2" y="19.5" width="1.6" height="8.8" rx="0.3" />
+                  <path d="M13.2 28.6H18.8C18.8 29.5 17.6 30.5 16 30.5C14.4 30.5 13.2 29.5 13.2 28.6Z" />
                 </svg>
                 <span className="h-px w-12 bg-gradient-to-l from-transparent to-gold/70 sm:w-16" />
               </div>
@@ -255,9 +272,7 @@ function FaqContent({ faqs }: { faqs: TempleFaq[] }) {
                   const isOpen = expandedId === faq.id;
                   const isLocationFaq =
                     faq.category === "Location" ||
-                    faq.id.includes("location") ||
-                    faq.question.toLowerCase().includes("where") ||
-                    faq.question.toLowerCase().includes("reach");
+                    faq.id.includes("location");
 
                   return (
                     <motion.div

@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { getCmsContent } from "@/lib/api/cms.functions";
 import type { CmsContent } from "@/lib/sanity/types";
-import { TEMPLE_PHOTOS } from "@/lib/media";
+import { HERO_IMAGE_SOURCES, TEMPLE_PHOTOS } from "@/lib/media";
 import { createSeoHead, SEO_PAGES } from "@/lib/seo";
 import { Navbar } from "@/components/site/Navbar";
 import { Hero } from "@/components/site/Hero";
@@ -29,7 +29,24 @@ async function fetchLatestCmsContent(): Promise<CmsContent> {
 
 export const Route = createFileRoute("/")({
   loader: () => getCmsContent(),
-  head: () => createSeoHead(SEO_PAGES.home),
+  head: () => {
+    const seo = createSeoHead(SEO_PAGES.home);
+    return {
+      ...seo,
+      links: [
+        ...(seo.links ?? []),
+        {
+          rel: "preload",
+          as: "image",
+          type: "image/webp",
+          imageSrcSet: HERO_IMAGE_SOURCES.webp.srcSet,
+          imageSizes: "100vw",
+          href: HERO_IMAGE_SOURCES.webp.w720,
+          fetchPriority: "high",
+        },
+      ],
+    };
+  },
   component: Home,
 });
 

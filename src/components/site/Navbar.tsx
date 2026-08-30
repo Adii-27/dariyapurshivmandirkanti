@@ -38,8 +38,15 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
   }, []);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    onScroll();
+    let isScrolled = window.scrollY > 30;
+    setScrolled(isScrolled);
+    const onScroll = () => {
+      const next = window.scrollY > 30;
+      if (next !== isScrolled) {
+        isScrolled = next;
+        setScrolled(next);
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -86,29 +93,32 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
           : "bg-transparent py-4"
       }`}
     >
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <a href="/#home" className="interactive-surface flex min-w-0 items-center gap-3 rounded-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-2.5 sm:gap-3 px-3.5 sm:px-6 lg:px-8">
+        <a
+          href="/#home"
+          className="interactive-surface flex shrink-0 items-center gap-2.5 sm:gap-3 rounded-xl"
+        >
           <img
             src={TEMPLE_LOGO}
             alt="Dariyapur Shiv Mandir Kanti logo"
-            className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-gold/60 shadow-glow"
+            className="h-10 w-10 sm:h-11 sm:w-11 shrink-0 rounded-full object-cover ring-1 ring-gold/60 shadow-glow"
           />
-          <div className="min-w-0 leading-tight">
-            <div className="truncate font-display text-base font-semibold text-ink sm:text-lg">
+          <div className="shrink-0 leading-tight">
+            <div className="whitespace-nowrap font-display text-[14px] sm:text-base md:text-lg font-semibold text-ink">
               Dariyapur Shiv Mandir
             </div>
-            <div className="font-hindi truncate text-xs text-saffron-deep sm:text-[13px]">
+            <div className="font-hindi whitespace-nowrap text-[11px] sm:text-xs md:text-[13px] text-saffron-deep">
               दरियापुर शिव मंदिर काँटी
             </div>
           </div>
         </a>
 
-        <nav className="hidden lg:flex items-center gap-4 xl:gap-6">
+        <nav className="hidden xl:flex items-center gap-2 xl:gap-3 2xl:gap-5">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className="relative rounded-sm whitespace-nowrap text-xs font-medium text-ink/75 transition-colors duration-300 hover:text-saffron-deep xl:text-sm
+              className="relative rounded-sm whitespace-nowrap text-xs xl:text-[12.5px] 2xl:text-sm font-medium text-ink/75 transition-colors duration-300 hover:text-saffron-deep
                          after:absolute after:-bottom-1.5 after:left-0 after:h-px after:w-0 after:bg-saffron-deep
                          after:transition-all hover:after:w-full"
             >
@@ -117,16 +127,16 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <LanguageSelector variant="desktop" />
           <a
             href="/#updates"
             onClick={markUpdatesSeen}
-            className="interactive-surface hidden min-h-11 items-center rounded-full gradient-saffron px-5 py-2 text-sm font-semibold text-primary-foreground shadow-sacred md:inline-flex"
+            className="interactive-surface hidden min-h-11 items-center rounded-full gradient-saffron px-4 xl:px-5 py-2 text-xs xl:text-sm font-semibold text-primary-foreground shadow-sacred 2xl:inline-flex"
           >
             {t.nav.updates}
             {unseenUpdates > 0 && (
-              <span className="ml-2 rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold tabular-nums text-saffron-deep">
+              <span className="ml-1.5 xl:ml-2 rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold tabular-nums text-saffron-deep">
                 {unseenUpdates}
               </span>
             )}
@@ -140,7 +150,7 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
             aria-controls="mobile-navigation"
             aria-expanded={open}
             onClick={() => setOpen((o) => !o)}
-            className="interactive-surface relative grid h-11 w-11 shrink-0 place-items-center rounded-full border border-border bg-card/80 shadow-sm lg:hidden"
+            className="interactive-surface relative grid h-10 w-10 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-full border border-border bg-card/80 shadow-sm xl:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             {unseenUpdates > 0 && (
@@ -163,7 +173,7 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-4 mt-3 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-3 shadow-sacred backdrop-blur-xl sm:mx-6 lg:hidden"
+            className="mx-4 mt-3 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-3 shadow-sacred backdrop-blur-xl sm:mx-6 xl:hidden"
           >
             <ul className="flex flex-col">
               <li className="mb-2">

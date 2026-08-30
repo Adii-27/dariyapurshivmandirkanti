@@ -36,16 +36,16 @@ export function HeritageHero() {
               </span>
             </div>
 
-            <h1 className="mt-6 font-display text-[clamp(2.5rem,11vw,4.25rem)] font-semibold leading-[1.04] tracking-tight text-cream sm:text-6xl">
+            <h1 className="mt-6 break-words font-display text-[clamp(2rem,10vw,4.25rem)] font-semibold leading-[1.04] tracking-tight text-cream sm:text-6xl">
               {t.heritage.heroTitle}{" "}
               <span className="text-gradient-gold">{t.heritage.heroTitleAccent}</span>
             </h1>
 
-            <p className="font-hindi mt-3 text-xl font-medium text-gold-soft sm:text-2xl">
+            <p className="font-hindi mt-3 break-words text-xl font-medium text-gold-soft sm:text-2xl">
               {t.heritage.heroHindi}
             </p>
 
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-cream/85 sm:text-lg">
+            <p className="mt-6 max-w-xl break-words text-sm leading-relaxed text-cream/85 sm:text-base md:text-lg">
               {t.heritage.heroSubtitle}
             </p>
 

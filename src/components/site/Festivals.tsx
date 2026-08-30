@@ -11,10 +11,20 @@ function useCountdown(target?: Date) {
   const [now, setNow] = useState<number | null>(null);
 
   useEffect(() => {
-    const tick = () => setNow(Date.now());
+    const tick = () => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      setNow(Date.now());
+    };
     tick();
     const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
+    const onVisibilityChange = () => {
+      if (!document.hidden) tick();
+    };
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.clearInterval(id);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
   if (!target || now === null) {
@@ -261,10 +271,10 @@ function UpcomingFestivalSlider({ festivals }: { festivals: FestivalUpdate[] }) 
     ) {
       return;
     }
-    const interval = window.setInterval(
-      () => setIndex((current) => (current + 1) % festivals.length),
-      3500,
-    );
+    const interval = window.setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      setIndex((current) => (current + 1) % festivals.length);
+    }, 3500);
     return () => window.clearInterval(interval);
   }, [festivals.length, isVisible, paused]);
 

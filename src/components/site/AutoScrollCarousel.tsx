@@ -67,7 +67,10 @@ export function AutoScrollCarousel({
 
     let frame = 0;
     let position = viewport.scrollLeft;
+    let running = !document.hidden;
+
     const tick = () => {
+      if (!running) return;
       position += speed;
       if (midpoint > 0 && position >= midpoint) {
         position -= midpoint;
@@ -75,10 +78,30 @@ export function AutoScrollCarousel({
       viewport.scrollLeft = position;
       frame = window.requestAnimationFrame(tick);
     };
-    frame = window.requestAnimationFrame(tick);
+
+    const handleVisibility = () => {
+      if (document.hidden) {
+        running = false;
+        window.cancelAnimationFrame(frame);
+      } else {
+        if (!running) {
+          running = true;
+          position = viewport.scrollLeft;
+          frame = window.requestAnimationFrame(tick);
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    if (running) {
+      frame = window.requestAnimationFrame(tick);
+    }
+
     return () => {
       window.cancelAnimationFrame(frame);
       window.removeEventListener("resize", updateMidpoint);
+      document.removeEventListener("visibilitychange", handleVisibility);
     };
   }, [children.length, isVisible, paused, speed]);
 

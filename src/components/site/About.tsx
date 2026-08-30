@@ -39,7 +39,10 @@ export function About() {
 
   useEffect(() => {
     if (!isVisible || paused || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const t = setInterval(() => setIdx((i) => (i + 1) % slides.length), 3000);
+    const t = setInterval(() => {
+      if (typeof document !== "undefined" && document.hidden) return;
+      setIdx((i) => (i + 1) % slides.length);
+    }, 3000);
     return () => clearInterval(t);
   }, [isVisible, paused]);
 

@@ -38,10 +38,30 @@ export function Hero() {
             </span>
           </div>
 
-          <h1 className="mt-6 break-words font-display text-[clamp(2.75rem,14vw,4.5rem)] font-semibold leading-[1.02] sm:text-6xl lg:text-7xl">
+          <h1 className="mt-6 break-words font-display text-[clamp(2rem,11vw,4.5rem)] font-semibold leading-[1.02] sm:text-6xl lg:text-7xl">
             {language === "hi" ? (
               <>
                 दरियापुर <span className="text-gradient-gold">शिव मंदिर</span> काँटी
+              </>
+            ) : language === "mr" ? (
+              <>
+                दरियापूर <span className="text-gradient-gold">शिव मंदिर</span> काँटी
+              </>
+            ) : language === "gu" ? (
+              <>
+                દરિયાપુર <span className="text-gradient-gold">શિવ મંદિર</span> કાંટી
+              </>
+            ) : language === "kn" ? (
+              <>
+                ದರಿಯಾಪುರ <span className="text-gradient-gold">ಶಿವ ಮಂದಿರ</span> ಕಾಂಟಿ
+              </>
+            ) : language === "te" ? (
+              <>
+                దరియాపూర్ <span className="text-gradient-gold">శివ మందిరం</span> కాంటి
+              </>
+            ) : language === "ta" ? (
+              <>
+                தரியாபூர் <span className="text-gradient-gold">சிவ ஆலயம்</span> காண்டி
               </>
             ) : (
               <>
@@ -49,32 +69,32 @@ export function Hero() {
               </>
             )}
           </h1>
-          <p className="font-hindi mt-3 text-2xl font-medium text-gold-soft sm:text-3xl">
+          <p className="font-hindi mt-3 break-words text-xl font-medium text-gold-soft sm:text-2xl md:text-3xl">
             {t.hero.titleHindi}
           </p>
 
-          <p className="mt-7 max-w-xl text-base leading-relaxed text-cream/85 sm:text-lg">
+          <p className="mt-6 max-w-xl break-words text-sm leading-relaxed text-cream/85 sm:text-base md:text-lg">
             {t.hero.description}
           </p>
 
-          <div className="mt-9 flex flex-col items-stretch gap-3 min-[430px]:flex-row min-[430px]:flex-wrap min-[430px]:items-center">
+          <div className="mt-8 flex flex-col items-stretch gap-2.5 min-[430px]:flex-row min-[430px]:flex-wrap min-[430px]:items-center">
             <motion.a
               href="#darshan"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.96 }}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full gradient-saffron px-7 py-3.5 text-sm font-semibold text-primary-foreground shadow-sacred transition-shadow duration-300 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full gradient-saffron px-5 py-3 text-xs font-semibold text-primary-foreground shadow-sacred transition-shadow duration-300 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink sm:px-6 sm:py-3.5 sm:text-sm"
             >
-              <Eye className="h-4 w-4" />
-              {t.hero.virtualDarshanBtn}
+              <Eye className="h-4 w-4 shrink-0" />
+              <span className="break-words">{t.hero.virtualDarshanBtn}</span>
             </motion.a>
             <motion.a
               href="#gallery"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.96 }}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-7 py-3.5 text-sm font-semibold text-cream shadow-sm backdrop-blur-md transition-[background-color,box-shadow] duration-300 hover:bg-ink/50 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-5 py-3 text-xs font-semibold text-cream shadow-sm backdrop-blur-md transition-[background-color,box-shadow] duration-300 hover:bg-ink/50 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink sm:px-6 sm:py-3.5 sm:text-sm"
             >
-              <Images className="h-4 w-4" />
-              {t.hero.galleryBtn}
+              <Images className="h-4 w-4 shrink-0" />
+              <span className="break-words">{t.hero.galleryBtn}</span>
             </motion.a>
             <motion.a
               href="https://maps.app.goo.gl/AwKW2occqHKrJVA9A"
@@ -82,24 +102,24 @@ export function Hero() {
               rel="noreferrer"
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.96 }}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-7 py-3.5 text-sm font-semibold text-cream shadow-sm backdrop-blur-md transition-[background-color,box-shadow] duration-300 hover:bg-ink/50 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-gold/50 bg-ink/30 px-5 py-3 text-xs font-semibold text-cream shadow-sm backdrop-blur-md transition-[background-color,box-shadow] duration-300 hover:bg-ink/50 hover:shadow-glow focus-visible:ring-gold focus-visible:ring-offset-ink sm:px-6 sm:py-3.5 sm:text-sm"
             >
-              <MapPin className="h-4 w-4" />
-              {t.hero.directionsBtn}
+              <MapPin className="h-4 w-4 shrink-0" />
+              <span className="break-words">{t.hero.directionsBtn}</span>
             </motion.a>
           </div>
 
-          <div className="mt-10 flex items-center gap-6 text-xs uppercase tracking-[0.18em] text-cream/70">
-            <div>
+          <div className="mt-8 flex flex-wrap items-center gap-4 text-xs uppercase tracking-[0.16em] text-cream/70 sm:gap-6 sm:tracking-[0.18em]">
+            <div className="min-w-0">
               <div className="text-[10px]">{t.hero.daily}</div>
-              <div className="text-sm normal-case tracking-normal text-gold-soft">
+              <div className="break-words text-xs normal-case tracking-normal text-gold-soft sm:text-sm">
                 {t.hero.hours}
               </div>
             </div>
-            <div className="h-8 w-px bg-cream/30" />
-            <div>
+            <div className="h-8 w-px shrink-0 bg-cream/30" />
+            <div className="min-w-0">
               <div className="text-[10px]">{t.hero.established}</div>
-              <div className="text-sm normal-case tracking-normal text-gold-soft">
+              <div className="text-xs normal-case tracking-normal text-gold-soft sm:text-sm">
                 {t.hero.estYear}
               </div>
             </div>

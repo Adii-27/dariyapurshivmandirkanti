@@ -94,13 +94,13 @@ export function StatusCard() {
     : t.statusCard.opensIn(remainingHours, remainingMinutes);
 
   return (
-    <div className="relative w-full max-w-sm rounded-3xl border border-gold/40 bg-card/85 p-6 backdrop-blur-xl shadow-sacred">
-      <div className="absolute -top-3 left-6 rounded-full gradient-gold px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-ink/80">
+    <div className="relative w-full max-w-sm rounded-3xl border border-gold/40 bg-card/85 p-5 backdrop-blur-xl shadow-sacred sm:p-6">
+      <div className="absolute -top-3 left-5 rounded-full gradient-gold px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-ink/80 sm:left-6">
         {t.statusCard.liveStatus}
       </div>
 
-      <div className="flex items-center gap-3">
-        <span className="relative grid h-4 w-4 place-items-center">
+      <div className="flex items-center gap-2.5 sm:gap-3">
+        <span className="relative grid h-4 w-4 shrink-0 place-items-center">
           <span
             className={`absolute inset-0 rounded-full ${isOpen ? "bg-emerald-500" : "bg-rose-500"} animate-pulse-glow`}
           />
@@ -109,38 +109,46 @@ export function StatusCard() {
           />
         </span>
         <span
-          className={`font-display text-2xl font-semibold ${isOpen ? "text-emerald-700" : "text-rose-700"}`}
+          className={`break-words font-display text-xl font-semibold leading-tight sm:text-2xl ${
+            isOpen ? "text-emerald-700" : "text-rose-700"
+          }`}
         >
           {statusLabel}
         </span>
       </div>
-      <p className="mt-1 text-sm text-muted-foreground">{statusNext}</p>
+      <p className="mt-1 break-words text-xs text-muted-foreground sm:text-sm">{statusNext}</p>
 
-      <div className="my-5 divider-om" />
+      <div className="my-4 divider-om sm:my-5" />
 
-      <div className="space-y-1.5 text-sm">
-        <div className="mb-1 flex items-baseline justify-between">
-          <span className="font-display text-base font-semibold text-ink">
+      <div className="space-y-1.5 text-xs sm:text-sm">
+        <div className="mb-1 flex items-baseline justify-between gap-2">
+          <span className="font-display text-sm font-semibold text-ink sm:text-base">
             {t.statusCard.templeHours}
           </span>
-          <span className="text-xs text-muted-foreground">{t.statusCard.hoursValue}</span>
+          <span className="shrink-0 text-[11px] text-muted-foreground sm:text-xs">
+            {t.statusCard.hoursValue}
+          </span>
         </div>
         {dayLabels.map((d, i) => (
           <div
             key={i}
-            className={`flex items-center justify-between rounded-md px-2.5 py-1.5 transition ${
+            className={`flex items-center justify-between gap-2 rounded-md px-2.5 py-1.5 transition ${
               today !== null && i === today
-                ? "bg-saffron/10 text-saffron-deep font-semibold"
+                ? isOpen
+                  ? "bg-emerald-500/10 text-emerald-700 font-semibold"
+                  : "bg-rose-500/10 text-rose-700 font-semibold"
                 : "text-ink/70"
             }`}
           >
-            <span>{d}</span>
-            <span className="tabular-nums">{t.statusCard.hoursValue}</span>
+            <span className="min-w-0 break-words">{d}</span>
+            <span className="shrink-0 text-right tabular-nums text-[11px] sm:text-xs">
+              {t.statusCard.hoursValue}
+            </span>
           </div>
         ))}
       </div>
 
-      <p className="mt-4 rounded-lg bg-secondary/70 px-3 py-2 text-[11.5px] leading-relaxed text-muted-foreground">
+      <p className="mt-4 rounded-lg bg-secondary/70 px-3 py-2 text-[11px] leading-relaxed text-muted-foreground sm:text-[11.5px]">
         {t.statusCard.timingsNote}
       </p>
     </div>

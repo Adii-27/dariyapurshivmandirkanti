@@ -57,7 +57,7 @@ function UpdateDateRange({
 
 export function Updates({ updates = [] }: { updates?: TempleUpdate[] }) {
   const { t, language } = useLanguage();
-  const locale = language === "hi" ? "hi-IN" : "en-IN";
+  const locale = `${language}-IN`;
   const [selectedUpdate, setSelectedUpdate] = useState<TempleUpdate | null>(null);
 
   const featured = useMemo(

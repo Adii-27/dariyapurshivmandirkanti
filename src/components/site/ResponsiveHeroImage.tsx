@@ -32,7 +32,7 @@ export function ResponsiveHeroImage({
         height={HERO_IMAGE_SOURCES.height}
         loading={loading}
         fetchPriority={fetchPriority}
-        decoding="async"
+        decoding={loading === "eager" ? "sync" : "async"}
         className={className}
       />
     </picture>
