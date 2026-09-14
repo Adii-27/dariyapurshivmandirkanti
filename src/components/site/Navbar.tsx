@@ -150,7 +150,7 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
             aria-controls="mobile-navigation"
             aria-expanded={open}
             onClick={() => setOpen((o) => !o)}
-            className="interactive-surface relative grid h-10 w-10 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-full border border-border bg-card/80 shadow-sm xl:hidden"
+            className="interactive-surface relative grid h-10 w-10 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-full border border-border bg-card/80 shadow-sm 2xl:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             {unseenUpdates > 0 && (
@@ -173,7 +173,7 @@ export function Navbar({ updateChanges = [] }: { updateChanges?: string[] }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="mx-4 mt-3 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-3 shadow-sacred backdrop-blur-xl sm:mx-6 xl:hidden"
+            className="mx-4 mt-3 max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-2xl border border-border bg-card/95 p-3 shadow-sacred backdrop-blur-xl sm:mx-6 2xl:hidden"
           >
             <ul className="flex flex-col">
               <li className="mb-2">
