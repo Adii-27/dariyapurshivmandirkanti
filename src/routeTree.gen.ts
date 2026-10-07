@@ -9,65 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as VisitorInformationRouteImport } from './routes/visitor-information'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as SevaRouteImport } from './routes/seva'
-import { Route as SangeetRouteImport } from './routes/sangeet'
-import { Route as LocationRouteImport } from './routes/location'
-import { Route as HeritageRouteImport } from './routes/heritage'
-import { Route as GalleryRouteImport } from './routes/gallery'
-import { Route as FaqRouteImport } from './routes/faq'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as HeritageRouteImport } from './routes/heritage'
+import { Route as LocationRouteImport } from './routes/location'
+import { Route as SangeetRouteImport } from './routes/sangeet'
+import { Route as SevaRouteImport } from './routes/seva'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as VisitorInformationRouteImport } from './routes/visitor-information'
 import { Route as ApiVisitorsRouteImport } from './routes/api/visitors'
-import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
 import { Route as ApiPushSanityRouteImport } from './routes/api/push/sanity'
+import { Route as ApiPushSubscribeRouteImport } from './routes/api/push/subscribe'
 import { Route as ApiPushFestivalsRunRouteImport } from './routes/api/push/festivals/run'
 
-const VisitorInformationRoute = VisitorInformationRouteImport.update({
-  id: '/visitor-information',
-  path: '/visitor-information',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SevaRoute = SevaRouteImport.update({
-  id: '/seva',
-  path: '/seva',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SangeetRoute = SangeetRouteImport.update({
-  id: '/sangeet',
-  path: '/sangeet',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LocationRoute = LocationRouteImport.update({
-  id: '/location',
-  path: '/location',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HeritageRoute = HeritageRouteImport.update({
-  id: '/heritage',
-  path: '/heritage',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GalleryRoute = GalleryRouteImport.update({
-  id: '/gallery',
-  path: '/gallery',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FaqRoute = FaqRouteImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -75,9 +35,49 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HeritageRoute = HeritageRouteImport.update({
+  id: '/heritage',
+  path: '/heritage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocationRoute = LocationRouteImport.update({
+  id: '/location',
+  path: '/location',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SangeetRoute = SangeetRouteImport.update({
+  id: '/sangeet',
+  path: '/sangeet',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SevaRoute = SevaRouteImport.update({
+  id: '/seva',
+  path: '/seva',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VisitorInformationRoute = VisitorInformationRouteImport.update({
+  id: '/visitor-information',
+  path: '/visitor-information',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiVisitorsRoute = ApiVisitorsRouteImport.update({
@@ -85,14 +85,14 @@ const ApiVisitorsRoute = ApiVisitorsRouteImport.update({
   path: '/api/visitors',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
-  id: '/api/push/subscribe',
-  path: '/api/push/subscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiPushSanityRoute = ApiPushSanityRouteImport.update({
   id: '/api/push/sanity',
   path: '/api/push/sanity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPushSubscribeRoute = ApiPushSubscribeRouteImport.update({
+  id: '/api/push/subscribe',
+  path: '/api/push/subscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPushFestivalsRunRoute = ApiPushFestivalsRunRouteImport.update({
@@ -227,67 +227,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/visitor-information': {
-      id: '/visitor-information'
-      path: '/visitor-information'
-      fullPath: '/visitor-information'
-      preLoaderRoute: typeof VisitorInformationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/seva': {
-      id: '/seva'
-      path: '/seva'
-      fullPath: '/seva'
-      preLoaderRoute: typeof SevaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sangeet': {
-      id: '/sangeet'
-      path: '/sangeet'
-      fullPath: '/sangeet'
-      preLoaderRoute: typeof SangeetRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/location': {
-      id: '/location'
-      path: '/location'
-      fullPath: '/location'
-      preLoaderRoute: typeof LocationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/heritage': {
-      id: '/heritage'
-      path: '/heritage'
-      fullPath: '/heritage'
-      preLoaderRoute: typeof HeritageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gallery': {
-      id: '/gallery'
-      path: '/gallery'
-      fullPath: '/gallery'
-      preLoaderRoute: typeof GalleryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -297,11 +241,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heritage': {
+      id: '/heritage'
+      path: '/heritage'
+      fullPath: '/heritage'
+      preLoaderRoute: typeof HeritageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/location': {
+      id: '/location'
+      path: '/location'
+      fullPath: '/location'
+      preLoaderRoute: typeof LocationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sangeet': {
+      id: '/sangeet'
+      path: '/sangeet'
+      fullPath: '/sangeet'
+      preLoaderRoute: typeof SangeetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seva': {
+      id: '/seva'
+      path: '/seva'
+      fullPath: '/seva'
+      preLoaderRoute: typeof SevaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/visitor-information': {
+      id: '/visitor-information'
+      path: '/visitor-information'
+      fullPath: '/visitor-information'
+      preLoaderRoute: typeof VisitorInformationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/visitors': {
@@ -311,18 +311,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiVisitorsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/push/subscribe': {
-      id: '/api/push/subscribe'
-      path: '/api/push/subscribe'
-      fullPath: '/api/push/subscribe'
-      preLoaderRoute: typeof ApiPushSubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/push/sanity': {
       id: '/api/push/sanity'
       path: '/api/push/sanity'
       fullPath: '/api/push/sanity'
       preLoaderRoute: typeof ApiPushSanityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/push/subscribe': {
+      id: '/api/push/subscribe'
+      path: '/api/push/subscribe'
+      fullPath: '/api/push/subscribe'
+      preLoaderRoute: typeof ApiPushSubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/push/festivals/run': {
