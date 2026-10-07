@@ -163,19 +163,6 @@ http://localhost:5173
 * Easy content management
 * Clean and scalable codebase
 
-## 🔮 Future Improvements
-
-* Online Donation System
-* Festival & Event Calendar
-* Live Darshan
-* Multi-language Support
-* Search Functionality
-* Visitor Analytics Dashboard
-* PWA (Progressive Web App)
-* Dark Mode
-
----
-
 ## 🤝 Contributing
 
 Contributions, ideas, and suggestions are always welcome.
